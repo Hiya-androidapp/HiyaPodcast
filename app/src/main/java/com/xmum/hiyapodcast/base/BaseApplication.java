@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
+import com.xmum.hiyapodcast.utils.LogUtil;
 
 public class BaseApplication extends Application {
 
@@ -22,5 +23,8 @@ public class BaseApplication extends Application {
             mXimalaya.setPackid("com.ximalaya.qunfeng");
             mXimalaya.init(this ,mAppSecret);
         }
+        //init LogUtil
+
+        LogUtil.init(this.getPackageName(), false);
     }
 }
