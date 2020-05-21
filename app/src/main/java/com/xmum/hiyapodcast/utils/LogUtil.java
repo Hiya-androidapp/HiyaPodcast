@@ -2,18 +2,11 @@ package com.xmum.hiyapodcast.utils;
 
 import android.util.Log;
 
-<<<<<<< HEAD
-=======
-/**
- * Created by TrillGates on 18/10/7.
- * God bless my code!
- */
->>>>>>> b0a17fa9cf6a7ddc651a2a7f3c8d772f76574931
+
 public class LogUtil {
 
     public static String sTAG = "LogUtil";
 
-<<<<<<< HEAD
     //控制是否要输出log
     public static boolean sIsRelease = false;
 
