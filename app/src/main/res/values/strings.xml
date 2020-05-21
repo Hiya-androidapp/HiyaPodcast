@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">HiyaPodcast</string>
     <string-array name="indicator_title">
-        <item>Recommandation</item>
+        <item>Recommendation</item>
         <item>Subscription</item>
         <item>History</item>
     </string-array>
