@@ -4,12 +4,12 @@
     android:layout_height="75dp"
     android:background="#ffffff">
 
-    <ImageView
+    <com.xmum.hiyapodcast.Views.RoundRectImageView.RoundRectImageView
         android:id="@+id/album_cover"
         android:layout_width="68dp"
+        android:scaleType="fitXY"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
-        android:background="#00ffff"
         android:layout_height="65dp"/>
 
     <LinearLayout

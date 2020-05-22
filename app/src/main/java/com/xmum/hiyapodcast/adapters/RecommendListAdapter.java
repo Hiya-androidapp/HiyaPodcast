@@ -63,7 +63,7 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
         public void setData(Album album) {
             //find each controller and set data
             //album cover
-            ImageView albumCoverIv = itemView.findViewById(R.id.album_cover);
+            ImageView albumCoverIv = (ImageView) itemView.findViewById(R.id.album_cover);
             //title
             TextView albumTitleTv = itemView.findViewById(R.id.album_title_tv);
             //description

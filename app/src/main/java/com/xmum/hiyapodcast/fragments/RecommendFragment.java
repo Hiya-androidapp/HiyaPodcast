@@ -30,6 +30,20 @@ public class RecommendFragment extends BaseFragment {
     private RecyclerView mRecommendRv;
     private RecommendListAdapter mRecommendListAdapter;
 
+    public final class UIUtil{
+        public UIUtil(){
+
+        }
+        public static int dip2px(Context context, double dpValue){
+            float density = context.getResources().getDisplyaMetrics().density;
+            return (int)(dpValue*(double)density+0.50);
+        }
+
+        public static int getScreenWidth(Context context){
+            return Context.getResources().getDisplyaMetrics().widthPixels;
+        }
+    }
+
     @Override
     protected View onSubViewLoaded(LayoutInflater layoutInflater, ViewGroup container) {
         mRootView = layoutInflater.inflate(R.layout.fragment_recommend, container, false);
@@ -41,6 +55,16 @@ public class RecommendFragment extends BaseFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecommendRv.setLayoutManager(linearLayoutManager);
+        mRecommendRv.addItemDecoration(new RecyclerView.ItemDecoration(){
+            @Override
+            public void getItemOffsets(Rect outRect, View view, recyclerview parent, RecyclerView.State state){
+                outRect.top=UIUtil.dip2px(view.getContext(), 5);
+                outRect.bottom=UIUtil.dip2px(view.getContext(), 5);
+                outRect.left=UIUtil.dip2px(view.getContext(), 5);
+                outRect.right=UIUtil.dip2px(view.getContext(), 5);
+                //super.getItemOffsets(outRect, view, parent, state);
+            }
+        });
         //3. set adapter
         mRecommendListAdapter = new RecommendListAdapter();
         mRecommendRv.setAdapter(mRecommendListAdapter);
@@ -48,6 +72,8 @@ public class RecommendFragment extends BaseFragment {
         getRecommendData();
         return mRootView;
     }
+
+
 //get recommend resource(guess what u like)
     private void getRecommendData() {
         Map<String,String> map = new HashMap<>();
