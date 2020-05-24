@@ -31,26 +31,11 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
     private View mRootView;
     private RecyclerView mRecommendRv;
     private RecommendListAdapter mRecommendListAdapter;
+    private RecommendPresenter mRecommendPresenter;
 
-    @Override
-    public void onRecommendListLoaded(List<Album> result) {
 
-    }
 
-    @Override
-    public void onLoaderMore(List<Album> result) {
 
-    }
-
-    @Override
-    public void onRefreshMore(List<Album> result) {
-
-    }
-
-    public void onDestroyView(){
-        super.onDestroyView();//取消接口的注册
-
-    }
     public final class UIUtil{
         public UIUtil(){
 
@@ -92,7 +77,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //fetch object to logic layer
         getRecommendData();
 
-        RecommendPresenter mRecommendPresenter = RecommendPresenter.getInstance();
+        mRecommendPresenter = RecommendPresenter.getInstance();
         //先设置通知接口的注册
         mRecommendPresenter.registerViewCallback(this)
         //getRecommendList
@@ -100,33 +85,31 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         return mRootView;
     }
 
-
-//get recommend resource(guess what u like)
-    private void getRecommendData() {
-        Map<String,String> map = new HashMap<>();
-        map.put(DTransferConstants.LIKE_COUNT, Constants.RECOMMEND_COUNT+"");
-        CommonRequest.getGuessLikeAlbum(map, new IDataCallBack<GussLikeAlbumList>() {
-            @Override
-            public void onSuccess(GussLikeAlbumList gussLikeAlbumList) {
-                if(gussLikeAlbumList != null){
-                    List<Album> albumList=gussLikeAlbumList.getAlbumList();
-                    //after getting data, update UI
-                    upRecommendUI(albumList);
-                }
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                LogUtil.d(TAG,"error -- >" + i);
-                LogUtil.d(TAG,"errorMsg -- >" + s);
-            }
-        });
+}
 
 
-    }
 
-    private void upRecommendUI(List<Album> albumList) {
-        //set data to adapter, and update UI
+    @Override
+    public void onRecommendListLoaded(List<Album> result) {
+        //获取推荐内容的时候这个方法就会被调用（成功）
+        //数据回来以后就是更新ui
+        // set data to adapter, and update UI
         mRecommendListAdapter.setData(albumList);
     }
-}
+
+    @Override
+    public void onLoaderMore(List<Album> result) {
+
+    }
+
+    @Override
+    public void onRefreshMore(List<Album> result) {
+
+    }
+
+    public void onDestroyView(){
+        super.onDestroyView();//取消接口的注册
+        if (mRecommendPresenter!=null) {
+            mRecommendPresenter.unRegisterViewCallBack(this);
+        }
+    }
