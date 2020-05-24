@@ -13,6 +13,8 @@ import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
+import com.xmum.hiyapodcast.Interface.IRecommendViewCallBack;
+import com.xmum.hiyapodcast.Presenters.RecommendPresenter;
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.adapters.RecommendListAdapter;
 import com.xmum.hiyapodcast.base.BaseFragment;
@@ -23,13 +25,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RecommendFragment extends BaseFragment {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack {
 
     private static final String TAG = "RecommendFragment";
     private View mRootView;
     private RecyclerView mRecommendRv;
     private RecommendListAdapter mRecommendListAdapter;
 
+    @Override
+    public void onRecommendListLoaded(List<Album> result) {
+
+    }
+
+    @Override
+    public void onLoaderMore(List<Album> result) {
+
+    }
+
+    @Override
+    public void onRefreshMore(List<Album> result) {
+
+    }
+
+    public void onDestroyView(){
+        super.onDestroyView();//取消接口的注册
+
+    }
     public final class UIUtil{
         public UIUtil(){
 
@@ -68,8 +89,14 @@ public class RecommendFragment extends BaseFragment {
         //3. set adapter
         mRecommendListAdapter = new RecommendListAdapter();
         mRecommendRv.setAdapter(mRecommendListAdapter);
-        //fetch data
+        //fetch object to logic layer
         getRecommendData();
+
+        RecommendPresenter mRecommendPresenter = RecommendPresenter.getInstance();
+        //先设置通知接口的注册
+        mRecommendPresenter.registerViewCallback(this)
+        //getRecommendList
+        mRecommendPresenter.getRecommendList();
         return mRootView;
     }
 
