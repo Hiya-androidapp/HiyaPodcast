@@ -24,6 +24,6 @@ public class BaseApplication extends Application {
             mXimalaya.init(this ,mAppSecret);
         }
         //init log, change to true before release
-        LogUtil.init(this.getPackageName(), true);
+        LogUtil.init(this.getPackageName(), false);
     }
 }

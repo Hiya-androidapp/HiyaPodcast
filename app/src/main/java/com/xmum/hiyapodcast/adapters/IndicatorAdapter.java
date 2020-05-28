@@ -9,9 +9,10 @@ import com.xmum.hiyapodcast.R;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNavigatorAdapter;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView;
+import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.BezierPagerIndicator;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ColorTransitionPagerTitleView;
-import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.SimplePagerTitleView;
+
 
 public class IndicatorAdapter extends CommonNavigatorAdapter {
 
@@ -40,7 +41,8 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
         //设置选中情况下的颜色为黑色
         colorTransitionPagerTitleView.setSelectedColor(Color.parseColor("#ffffff"));
         //单位sp
-        colorTransitionPagerTitleView.setTextSize(18);
+        colorTransitionPagerTitleView.setTextSize(19);
+
         //设置要显示的内容
         colorTransitionPagerTitleView.setText(mTitles[index]);
         //设置title的点击事件，这里的话，如果点击了title,那么就选中下面的viewPager到对应的index里面去
@@ -60,9 +62,12 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
 
     @Override
     public IPagerIndicator getIndicator(Context context) {
-        LinePagerIndicator indicator = new LinePagerIndicator(context);
-        indicator.setMode(LinePagerIndicator.MODE_WRAP_CONTENT);
-        indicator.setColors(Color.parseColor("#ffffff"));
+//        LinePagerIndicator indicator = new LinePagerIndicator(context);
+//        indicator.setMode(LinePagerIndicator.MODE_MATCH_EDGE);
+//        indicator.setColors(Color.parseColor("#ffffff"));
+//        return indicator;
+        BezierPagerIndicator indicator = new BezierPagerIndicator(context);
+        indicator.setColors(Color.parseColor("#ffffff"), Color.parseColor("#ffffff"), Color.parseColor("#ffffff"), Color.parseColor("#76b0ff"), Color.parseColor("#c683fe"));
         return indicator;
     }
 
