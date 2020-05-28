@@ -13,6 +13,7 @@ public abstract class BaseFragment extends Fragment {
 
     private View mRootView;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -21,5 +22,8 @@ public abstract class BaseFragment extends Fragment {
         return mRootView;
     }
 
-    protected abstract View onSubViewLoaded(LayoutInflater inflater, ViewGroup container);
+
+    protected abstract View onSubViewLoaded(LayoutInflater layoutInflater, ViewGroup container);
+
 }
+

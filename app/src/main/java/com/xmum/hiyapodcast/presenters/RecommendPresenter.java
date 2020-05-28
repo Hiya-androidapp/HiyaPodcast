@@ -38,6 +38,7 @@ public class RecommendPresenter implements IRecommendPresenter {
     }
     @Override
     public void getRecommendList() {
+        updateLoading();
         Map<String, String> map = new HashMap<>();
         //number of return
         map.put(DTransferConstants.LIKE_COUNT, Constant.RECOMMAND_COUNT+"");
@@ -76,16 +77,30 @@ public class RecommendPresenter implements IRecommendPresenter {
     }
 
     private void handlerRecommendResult(List<Album> albumList) {
+
         //inform ui to update
         if(mCallBacks!=null)
         {
+            if(albumList.size()==0)
+            {
+                for(IRecommendViewCallBack callBack:mCallBacks)
+                    callBack.onEmpty();
+            }
+            else{
             for(IRecommendViewCallBack callBack:mCallBacks)
             {
                 callBack.onRecommendListLoaded(albumList);
             }
+            }
         }
     }
-
+    private void updateLoading()
+    {
+        for(IRecommendViewCallBack callBack:mCallBacks)
+        {
+            callBack.onLoading();
+        }
+    }
     @Override
     public void pull2RefreshMore() {
 

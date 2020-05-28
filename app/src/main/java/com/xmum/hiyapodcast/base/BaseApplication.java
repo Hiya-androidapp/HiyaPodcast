@@ -6,8 +6,10 @@ import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
-public class BaseApplication extends Application {
+import android.os.Handler;
 
+public class BaseApplication extends Application {
+    private static Handler sHandler=null;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -25,5 +27,9 @@ public class BaseApplication extends Application {
         }
         //init log, change to true before release
         LogUtil.init(this.getPackageName(), false);
+        sHandler=new Handler();
+    }
+    public static Handler getsHandler(){
+        return sHandler;
     }
 }
