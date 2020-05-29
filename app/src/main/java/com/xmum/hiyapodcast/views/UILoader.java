@@ -12,8 +12,11 @@ import androidx.annotation.Nullable;
 
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.base.BaseApplication;
+import com.xmum.hiyapodcast.utils.LogUtil;
 
 public abstract class UILoader extends FrameLayout {
+    private static final String TAG ="UILoder" ;
+
     public enum UIStatus{
         LOADING,SUCCESS,NETWORK_ERROR,EMPTY,NONE
     }
@@ -39,7 +42,7 @@ public abstract class UILoader extends FrameLayout {
     public void updateStatus(UIStatus status)
     {
         mCurrentStatus=status;
-        //upatedate ui must in the main process
+        // ui upatedate must in the main process
         BaseApplication.getsHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -56,14 +59,17 @@ public abstract class UILoader extends FrameLayout {
         if (mLoadingView == null) {
             mLoadingView = getLoadingView();
             addView(mLoadingView);
+
         }
         //根据状态设置是否可见
+        LogUtil.d(TAG,"loading"+mCurrentStatus);
         mLoadingView.setVisibility(mCurrentStatus == UIStatus.LOADING ? VISIBLE : GONE);
 
         //成功
         if (mSuccessView == null) {
             mSuccessView = getSuccessView(this);
             addView(mSuccessView);
+
         }
         //根据状态设置是否可见
         mSuccessView.setVisibility(mCurrentStatus == UIStatus.SUCCESS ? VISIBLE : GONE);

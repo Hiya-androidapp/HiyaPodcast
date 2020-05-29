@@ -100,6 +100,8 @@ public class RecommendPresenter implements IRecommendPresenter {
         {
             callBack.onLoading();
         }
+        LogUtil.d(TAG,"in -->"+"load");
+
     }
     @Override
     public void pull2RefreshMore() {

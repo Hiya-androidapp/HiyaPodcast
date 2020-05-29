@@ -1,5 +1,6 @@
 package com.xmum.hiyapodcast.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import java.util.List;
 
 public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
     private  List<Album> mData=new ArrayList<>();
+    private static String TAG="RecommendListAdapter";
+    private OnRecommendItemClickListener mItemClickListner=null;
+
     @NonNull
     @Override
     public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -27,9 +31,21 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, final int position) {
         //set data
         holder.itemView.setTag(position);
+        holder.itemView.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                if(mItemClickListner!=null)
+                {
+                    int ClickPosition=(int) v.getTag();
+                    mItemClickListner.onItemClick(ClickPosition,mData.get(ClickPosition));
+                }
+                Log.d(TAG,"Click-->"+v.getTag());
+            }
+        });
         holder.setData(mData.get(position));
     }
 
@@ -80,5 +96,12 @@ public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdap
             Picasso.with(itemView.getContext()).load(album.getCoverUrlLarge()).into(albumCoverIv);
 
         }
+    }
+    public void setOnRecommendItemClickListner(OnRecommendItemClickListener listner)
+    {
+        this.mItemClickListner=listner;
+    }
+    public interface OnRecommendItemClickListener {
+        void onItemClick(int position,Album album);
     }
 }

@@ -1,90 +1,85 @@
 package com.xmum.hiyapodcast.fragments;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
-import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
-import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
+import com.xmum.hiyapodcast.DetailActivity;
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.adapters.RecommendListAdapter;
 import com.xmum.hiyapodcast.base.BaseFragment;
 import com.xmum.hiyapodcast.interfaces.IRecommendViewCallBack;
+import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.presenters.RecommendPresenter;
-import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.UILoader;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, RecommendListAdapter.OnRecommendItemClickListener {
 
     private static final String TAG="RecommendFragment";
     private View mRootView;
-    private  RecyclerView mRecommendRV;
+    private  RecyclerView mRecommendRv;
     private  RecommendListAdapter mRecommendListAdapter;
     private RecommendPresenter mRecommendPresenter;
     private UILoader mUiLoader;
     @Override
     protected View onSubViewLoaded(final LayoutInflater layoutInflater, ViewGroup container) {
-
-         mUiLoader=new UILoader(getContext()) {
+        mUiLoader = new UILoader(getContext()) {
             @Override
             protected View getSuccessView(ViewGroup container) {
-                return createSuccessView(layoutInflater,container);
+                return createSuccessView(layoutInflater, container);
             }
         };
 
-        //view loading complete
-        mRootView = layoutInflater.inflate(R.layout.fragment_recommend, container, false);
-        //1.找到控件
-        mRecommendRV=mRootView.findViewById(R.id.recommend_list);
-        //2.设置布局管理器
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        mRecommendRV.setLayoutManager(linearLayoutManager);
-        mRecommendRV.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                outRect.top= UIUtil.dip2px(view.getContext(),5);
-                outRect.bottom=UIUtil.dip2px(view.getContext(),5);
-                outRect.left=UIUtil.dip2px(view.getContext(),5);
-                outRect.right=UIUtil.dip2px(view.getContext(),5);
-            }
-        });
-        //3.设置适配器
-        mRecommendListAdapter=new RecommendListAdapter();
-        mRecommendRV.setAdapter(mRecommendListAdapter);
-        // get logical layer obj
+        //get logic layer object
         mRecommendPresenter = RecommendPresenter.getInstance();
         //register before using inteface
         mRecommendPresenter.registerViewCallback(this);
+        //get recommendation list
         mRecommendPresenter.getRecommendList();
         //不允许重复绑定
-        if(mUiLoader.getParent() instanceof  ViewGroup)
-        {
+        if (mUiLoader.getParent() instanceof ViewGroup) {
             ((ViewGroup) mUiLoader.getParent()).removeView(mUiLoader);
         }
 
         mUiLoader.setOnRetryClickListener(this);
         //return view
-        return mRootView;
+        return mUiLoader;
     }
 
     private View createSuccessView(LayoutInflater layoutInflater, ViewGroup container) {
-        mRootView=layoutInflater.inflate(R.layout.fragment_recommend,container,false);
+        //view load finished
+        mRootView = layoutInflater.inflate(R.layout.fragment_recommend, container, false);
+        //the use of RecycleView
+        //1. find the controller
+        mRecommendRv = mRootView.findViewById(R.id.recommend_list);
+        //2. set layout manager
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
+        mRecommendRv.setLayoutManager(linearLayoutManager);
+        mRecommendRv.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.top = UIUtil.dip2px(view.getContext(), 5);
+                outRect.bottom = UIUtil.dip2px(view.getContext(), 5);
+                outRect.left = UIUtil.dip2px(view.getContext(), 5);
+                outRect.right = UIUtil.dip2px(view.getContext(), 5);
+            }
+        });
+        //3. set adapter
+        mRecommendListAdapter = new RecommendListAdapter();
+        mRecommendRv.setAdapter(mRecommendListAdapter);
+        mRecommendListAdapter.setOnRecommendItemClickListner(this);
         return mRootView;
     }
 
@@ -119,6 +114,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
     @Override
     public void onLoading() {
         mUiLoader.updateStatus(UILoader.UIStatus.LOADING);
+        LogUtil.d(TAG,"success");
     }
     public void onDestroyView()
     {
@@ -136,5 +132,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //when network error, user touch retry
         //we can just reobtain the data
         mRecommendPresenter.getRecommendList();
+    }
+
+    @Override
+    public void onItemClick(int position,Album album) {
+        AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+
+        //click item, jumpt to item
+        Intent intent= new Intent(getContext(), DetailActivity.class);
+        startActivity(intent);
     }
 }
