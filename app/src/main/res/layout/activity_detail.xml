@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#fff4f4f4">
+    android:background="#fff4f4f4" >
 
 
     <ImageView
@@ -131,6 +131,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/player_control_container" />
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/album_detail_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/player_control_container"/>

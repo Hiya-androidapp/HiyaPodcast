@@ -1,6 +1,7 @@
 package com.xmum.hiyapodcast;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -9,10 +10,15 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.xmum.hiyapodcast.adapters.DetailListAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailPresenter;
@@ -20,6 +26,8 @@ import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.utils.ImageBlur;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.RoundRectImageView;
+
+import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
@@ -31,6 +39,10 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     private TextView mAlbumTitle;
     private TextView mAlbumAuthor;
     private AlbumDetailPresenter mAlbumDetailPresenter;
+    private int mCurrentPage=1;
+    private RecyclerView mDetailList;
+    private DetailListAdapter mDetailListAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +55,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
 
         mAlbumDetailPresenter=AlbumDetailPresenter.getInstance();
         mAlbumDetailPresenter.registerViewCallback(this);
+
     }
 
     private void initView() {
@@ -50,15 +63,38 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         mSmallCover=this.findViewById(R.id.viv_small_cover);
         mAlbumTitle=this.findViewById(R.id.tv_album_title);
         mAlbumAuthor= this.findViewById(R.id.tv_album_author);
+        mDetailList=this.findViewById(R.id.album_detail_list);
+        //use recycleview
+        //1.set layout controller
+        LinearLayoutManager layoutManager=new LinearLayoutManager(this);
+        mDetailList.setLayoutManager(layoutManager);
+        //2.set adapter
+        mDetailListAdapter = new DetailListAdapter();
+        mDetailList.setAdapter(mDetailListAdapter);
+        //set item margin
+        mDetailList.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = UIUtil.dip2px(view.getContext(), 5);
+                outRect.bottom = UIUtil.dip2px(view.getContext(), 5);
+                outRect.left = UIUtil.dip2px(view.getContext(), 5);
+                outRect.right = UIUtil.dip2px(view.getContext(), 5);
+            }
+        });
     }
 
     @Override
     public void onDetailListLoaded(List<Track> trackList) {
+        //update/set data
+        mDetailListAdapter.setData(trackList);
 
     }
 
     @Override
     public void onAlbumLoaded(Album album) {
+        //get detail content
+        long id=album.getId();
+        mAlbumDetailPresenter.getAlbumDetail((int)id,mCurrentPage);
         if(mAlbumTitle!=null)
         {
             mAlbumTitle.setText(album.getAlbumTitle());
