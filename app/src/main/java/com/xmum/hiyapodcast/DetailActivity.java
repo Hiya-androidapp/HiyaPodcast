@@ -1,12 +1,17 @@
 package com.xmum.hiyapodcast;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.provider.Contacts;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,13 +31,14 @@ import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.utils.ImageBlur;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.RoundRectImageView;
+import com.xmum.hiyapodcast.views.UILoader;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailCallback {
+public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener {
     private static final String TAG ="" ;
     private ImageView mLargeCover;
     private RoundRectImageView mSmallCover;
@@ -42,6 +48,9 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     private int mCurrentPage=1;
     private RecyclerView mDetailList;
     private DetailListAdapter mDetailListAdapter;
+    private FrameLayout mDetailListContainer;
+    private UILoader mUiLoader;
+    private long mCurrentId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +68,30 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     }
 
     private void initView() {
+
+        mDetailListContainer = this.findViewById(R.id.detail_list_container);
+        //
+        if (mUiLoader == null) {
+            mUiLoader = new UILoader(this) {
+                @Override
+                protected View getSuccessView(ViewGroup container) {
+                    return createSuccessView(container);
+                }
+            };
+            mDetailListContainer.removeAllViews();
+            mDetailListContainer.addView(mUiLoader);
+            mUiLoader.setOnRetryClickListener(DetailActivity.this);
+        }
         mLargeCover=this.findViewById(R.id.iv_large_cover);
         mSmallCover=this.findViewById(R.id.viv_small_cover);
         mAlbumTitle=this.findViewById(R.id.tv_album_title);
         mAlbumAuthor= this.findViewById(R.id.tv_album_author);
-        mDetailList=this.findViewById(R.id.album_detail_list);
+
+    }
+
+    private View createSuccessView(ViewGroup container) {
+        View detailListView = LayoutInflater.from(this).inflate(R.layout.item_detail_list, container, false);
+        mDetailList=detailListView.findViewById(R.id.album_detail_list);
         //use recycleview
         //1.set layout controller
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
@@ -75,26 +103,52 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         mDetailList.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                outRect.top = UIUtil.dip2px(view.getContext(), 5);
-                outRect.bottom = UIUtil.dip2px(view.getContext(), 5);
-                outRect.left = UIUtil.dip2px(view.getContext(), 5);
-                outRect.right = UIUtil.dip2px(view.getContext(), 5);
+                outRect.top = UIUtil.dip2px(view.getContext(), 2);
+                outRect.bottom = UIUtil.dip2px(view.getContext(), 2);
+                outRect.left = UIUtil.dip2px(view.getContext(), 2);
+                outRect.right = UIUtil.dip2px(view.getContext(), 2);
             }
         });
+
+        mDetailListAdapter.setItemClickListener(this);
+        return detailListView;
     }
 
     @Override
     public void onDetailListLoaded(List<Track> trackList) {
+        //judge data result, control UI based on the result
+        if (trackList == null || trackList.size() == 0) {
+            if (mUiLoader != null) {
+                mUiLoader.updateStatus(UILoader.UIStatus.EMPTY);
+            }
+        }
+
+        if (mUiLoader != null) {
+            mUiLoader.updateStatus(UILoader.UIStatus.SUCCESS);
+        }
         //update/set data
         mDetailListAdapter.setData(trackList);
 
     }
 
     @Override
+    public void onNetworkError(int i, String s) {
+        //error happens, show network error status
+        mUiLoader.updateStatus(UILoader.UIStatus.NETWORK_ERROR);
+    }
+
+    @Override
     public void onAlbumLoaded(Album album) {
         //get detail content
         long id=album.getId();
-        mAlbumDetailPresenter.getAlbumDetail((int)id,mCurrentPage);
+        mCurrentId = id;
+        if (mAlbumDetailPresenter != null) {
+            mAlbumDetailPresenter.getAlbumDetail((int)id,mCurrentPage);
+        }
+        //get data, show loading status
+        if (mUiLoader != null) {
+            mUiLoader.updateStatus(UILoader.UIStatus.LOADING);
+        }
         if(mAlbumTitle!=null)
         {
             mAlbumTitle.setText(album.getAlbumTitle());
@@ -125,5 +179,20 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         {
             Picasso.with(this).load(album.getCoverUrlLarge()).into(mSmallCover);
         }
+    }
+
+    @Override
+    public void onRetryClick() {
+        //click to reloading
+        if (mAlbumDetailPresenter != null) {
+            mAlbumDetailPresenter.getAlbumDetail((int)mCurrentId, mCurrentPage);
+        }
+    }
+
+    @Override
+    public void onItemClick() {
+        //TODO: jump to player interface
+        Intent intent = new Intent(this, PlayerActivity.class);
+        startActivity(intent);
     }
 }
