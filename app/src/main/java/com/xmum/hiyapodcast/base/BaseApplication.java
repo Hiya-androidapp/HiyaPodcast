@@ -4,12 +4,18 @@ import android.app.Application;
 
 import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
 import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
+import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
+import android.content.Context;
 import android.os.Handler;
 
 public class BaseApplication extends Application {
+
+    private static Context sContext =null;
+
     private static Handler sHandler=null;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -25,9 +31,19 @@ public class BaseApplication extends Application {
             mXimalaya.setPackid("com.ximalaya.qunfeng");
             mXimalaya.init(this ,mAppSecret);
         }
+        //initialize the player
+        XmPlayerManager.getInstance(this).init();
+
         //init log, change to true before release
         LogUtil.init(this.getPackageName(), false);
         sHandler=new Handler();
+
+        sContext = getBaseContext();
+
+    }
+    public static Context getAppContex()
+    {
+        return sContext;
     }
     public static Handler getsHandler(){
         return sHandler;

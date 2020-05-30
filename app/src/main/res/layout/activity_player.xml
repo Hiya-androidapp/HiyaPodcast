@@ -38,7 +38,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:text="00:00"
-                android:textSize="16sp" />
+                android:textSize="13sp" />
 
             <SeekBar
                 android:id="@+id/track_seek_bar"
@@ -57,7 +57,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:text="00:00"
-                android:textSize="16sp" />
+                android:textSize="13sp" />
 
 
         </RelativeLayout>

@@ -4,13 +4,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.provider.Contacts;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,8 +23,8 @@ import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.xmum.hiyapodcast.adapters.DetailListAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
-import com.xmum.hiyapodcast.interfaces.IAlbumDetailPresenter;
 import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
+import com.xmum.hiyapodcast.presenters.PlayerPresenter;
 import com.xmum.hiyapodcast.utils.ImageBlur;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.RoundRectImageView;
@@ -190,7 +187,10 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     }
 
     @Override
-    public void onItemClick() {
+    public void onItemClick(List<Track> detailData, int position) {
+        //set player data
+        PlayerPresenter playerPresenter=PlayerPresenter.getsPlayerPresenter();
+        playerPresenter.setPlayList(detailData,position);
         //TODO: jump to player interface
         Intent intent = new Intent(this, PlayerActivity.class);
         startActivity(intent);
