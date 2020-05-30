@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -24,8 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerActivity extends BaseActivity implements IPlayerCallback {
+public class PlayerActivity extends BaseActivity implements IPlayerCallback, ViewPager.OnPageChangeListener {
 
+    private static final String TAG = "?";//这里有问题 但我没看到他什么时候创建的tag
     private PlayerPresenter mPlayerPresenter;
     private ImageView mControlBtn;
 
@@ -42,6 +44,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     private String mTrackTitleText;
     private ViewPager mTrackPageView;
     private PlayerTrackPagerAdapter mTrackPagerAdapter;
+    private boolean mIsUserSlidePager=false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,6 +137,21 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
                 {
                     mPlayerPresenter.playPre();
                 }
+            }
+        });
+
+        mTrackPageView.addOnPageChangeListener(this);
+
+        mTrackPageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                switch (action){
+                    case MotionEvent.ACTION_DOWN:
+                        mIsUserSlidePager=true;
+                    break;
+                }
+                return false;
             }
         });
     }
@@ -261,13 +279,38 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     }
 
     @Override
-    public void onCheckUpdate(Track track) {
+    public void onCheckUpdate(Track track, int playIndex) {
         this.mTrackTitleText=track.getTrackTitle();
         if(mTrackTitle!=null)
         {//设置当前节目标题
             mTrackTitle.setText(mTrackTitleText);
         }
         //当节目改变的时候我们就获取当前播放中的位置
-        //TODO
+        //当前的节目改变以后 要修改页面的图片
+        if (mTrackPageView != null) {
+            mTrackPageView.setCurrentItem(playIndex,true);
+        }
+    }
+
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        LogUtil.d(TAG, "position -- > "+position);//创建了一个local TAG因为原本的不可读
+        //当页面选中，就切换播放的内容
+        if (mPlayerPresenter != null && mIsUserSlidePager) {
+            mPlayerPresenter.playByIndex(position);
+        }
+        mIsUserSlidePager=false;
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }

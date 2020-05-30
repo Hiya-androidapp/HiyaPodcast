@@ -27,6 +27,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     private  final XmPlayerManager mPlayerManager;
     private static final String TAG="PlayerPresenter";
     private Track mCurrentTrack;
+    private int mCurrentIndex=0;
 
     private PlayerPresenter (){
         mPlayerManager = XmPlayerManager.getInstance(BaseApplication.getAppContex());
@@ -60,7 +61,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
             isPlayListSet=true;
             //在一个专辑中第一次打开一个播放界面获取名称
             mCurrentTrack = list.get(playIndex);
-
+            mCurrentIndex=playIndex;
         } else {
             LogUtil.d(TAG,"mPlayerManager null");
         }
@@ -138,7 +139,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
-        iPlayerCallback.onCheckUpdate(mCurrentTrack);
+        iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
         if(!mIPlayerCallbacks.contains(iPlayerCallback))
         {
             mIPlayerCallbacks.add(iPlayerCallback);
@@ -230,6 +231,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         //curMordel stand for current content
         //getKind() to get the kind of content
         //track represent track type
+        mCurrentIndex=mPlayerManager.getCurrentIndex();
         if(curModel instanceof Track)
         {
             Track currentTrack = (Track) curModel;
@@ -238,9 +240,10 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
             //update ui
             for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks)
             {
-                iPlayerCallback.onCheckUpdate(mCurrentTrack);
+                iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
             }
         }
+
     }
 
     @Override

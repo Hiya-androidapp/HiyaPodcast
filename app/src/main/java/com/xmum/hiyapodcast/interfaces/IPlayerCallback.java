@@ -39,5 +39,5 @@ public interface IPlayerCallback  {
      * @param track 节目
      */
     // update the current title
-    void onCheckUpdate(Track track);
+    void onCheckUpdate(Track track, int playIndex);
 }
