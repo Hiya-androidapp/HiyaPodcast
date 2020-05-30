@@ -122,7 +122,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //dismiss the register of inteface
         if(mRecommendPresenter!=null)
         {
-            mRecommendPresenter.unRegisterViewCallBack(this);
+            mRecommendPresenter.unRegisterViewCallback(this);
         }
     }
 
@@ -138,7 +138,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
     public void onItemClick(int position,Album album) {
         AlbumDetailPresenter.getInstance().setTargetAlbum(album);
 
-        //click item, jumpt to item
+        //click item, jump to item
         Intent intent= new Intent(getContext(), DetailActivity.class);
         startActivity(intent);
     }
