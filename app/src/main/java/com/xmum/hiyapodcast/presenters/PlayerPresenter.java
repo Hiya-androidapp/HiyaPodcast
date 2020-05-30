@@ -1,5 +1,7 @@
 package com.xmum.hiyapodcast.presenters;
 
+import android.util.Log;
+
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.advertis.Advertis;
 import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
@@ -23,6 +25,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     private List<IPlayerCallback> mIPlayerCallbacks=new ArrayList<>();
     private  final XmPlayerManager mPlayerManager;
     private static final String TAG="PlayerPresenter";
+    private String mTrackTitle;
 
     private PlayerPresenter (){
         mPlayerManager = XmPlayerManager.getInstance(BaseApplication.getAppContex());
@@ -51,6 +54,13 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         if(mPlayerManager!=null){
             mPlayerManager.setPlayList(list,playIndex);
             isPlayListSet=true;
+            //在一个专辑中第一次打开一个播放界面获取名称
+            Track track1 = list.get(playIndex);
+            mTrackTitle = track1.getTrackTitle();
+            if(mTrackTitle==null)
+            {
+                mTrackTitle = track1.getTrackTitle();
+            }
         }else {
             LogUtil.d(TAG,"mPlayerManager null");
         }
@@ -122,6 +132,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
+        iPlayerCallback.onTrackTitleUpdate(mTrackTitle);
         if(!mIPlayerCallbacks.contains(iPlayerCallback))
         {
             mIPlayerCallbacks.add(iPlayerCallback);
@@ -208,8 +219,22 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     //switch mode
     @Override
-    public void onSoundSwitch(PlayableModel playableModel, PlayableModel playableModel1) {
-        LogUtil.d(TAG,"onSoundSwitch");
+    public void onSoundSwitch(PlayableModel lastModel, PlayableModel curModel) {
+
+        //curMordel stand for current content
+        //getKind() to get the kind of content
+        //track represent track type
+        if(curModel instanceof Track)
+        {
+            Track currentTrack = (Track) curModel;
+            mTrackTitle = currentTrack.getTrackTitle();
+            LogUtil.d(TAG,"TITLE "+mTrackTitle);
+            //update ui
+            for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks)
+            {
+                iPlayerCallback.onTrackTitleUpdate(mTrackTitle);
+            }
+        }
     }
 
     @Override

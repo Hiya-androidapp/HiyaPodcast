@@ -34,5 +34,6 @@ public interface IPlayerCallback  {
     //ad load finished
     void onAdFinished();
 
-
+    // update the current title
+    void onTrackTitleUpdate(String title);
 }

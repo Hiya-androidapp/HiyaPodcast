@@ -2,6 +2,7 @@ package com.xmum.hiyapodcast;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -34,6 +35,8 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     private boolean mIsUserTouchProgressBar= false;
     private ImageView mPlayNextBtn;
     private ImageView mPlayPretBtn;
+    private TextView mTrackTitle;
+    private String mTrackTitleText;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,6 +139,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         mMSeekBar = this.findViewById(R.id.track_seek_bar);
         mPlayNextBtn = this.findViewById(R.id.play_next);
         mPlayPretBtn = this.findViewById(R.id.play_pre);
+        mTrackTitle = this.findViewById(R.id.track_title);
+        if(!TextUtils.isEmpty(mTrackTitleText))
+        {
+            mTrackTitle.setText(mTrackTitleText);
+        }
     }
 
     @Override
@@ -234,5 +242,14 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     @Override
     public void onAdFinished() {
 
+    }
+
+    @Override
+    public void onTrackTitleUpdate(String title) {
+        this.mTrackTitleText=title;
+        if(mTrackTitle!=null)
+        {
+            mTrackTitle.setText(title);
+        }
     }
 }
