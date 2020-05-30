@@ -105,7 +105,7 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
     }
 
     @Override
-    public void unRegisterViewCallback(IAlbumDetailCallback detailCallback) {
+    public void unRegisterViewCallBack(IAlbumDetailCallback detailCallback) {
         mCallbacks.remove(detailCallback);
     }
 

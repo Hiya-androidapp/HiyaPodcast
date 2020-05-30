@@ -1,6 +1,8 @@
 package com.xmum.hiyapodcast.interfaces;
 
-public interface IAlbumDetailPresenter  {
+import com.xmum.hiyapodcast.base.IBasePresenter;
+
+public interface IAlbumDetailPresenter  extends IBasePresenter<IAlbumDetailCallback> {
     /**
      * pull down to refresh more
      */
@@ -17,6 +19,5 @@ public interface IAlbumDetailPresenter  {
     /**
      * register and unregister ui inform
      */
-    void registerViewCallback(IAlbumDetailCallback detailCallback);
-    void unRegisterViewCallback(IAlbumDetailCallback detailCallback);
+
 }
