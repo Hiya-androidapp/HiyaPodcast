@@ -1,6 +1,7 @@
 package com.xmum.hiyapodcast;
 
 import android.annotation.SuppressLint;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,9 +10,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
+import com.xmum.hiyapodcast.adapters.PlayerTrackPagerAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
 import com.xmum.hiyapodcast.presenters.PlayerPresenter;
@@ -37,6 +40,8 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     private ImageView mPlayPretBtn;
     private TextView mTrackTitle;
     private String mTrackTitleText;
+    private ViewPager mTrackPageView;
+    private PlayerTrackPagerAdapter mTrackPagerAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +51,8 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         mPlayerPresenter = PlayerPresenter.getsPlayerPresenter();
         mPlayerPresenter.registerViewCallback(this);
         initView();
+        //在界面初始化以后，才去获取数据
+        mPlayerPresenter.getPlayList();
         initEvent();
         startPlay();
     }
@@ -144,6 +151,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
         {
             mTrackTitle.setText(mTrackTitleText);
         }
+        mTrackPageView = this.findViewById(R.id.track_pager_view);
+        //创建适配器
+        mTrackPagerAdapter = new PlayerTrackPagerAdapter();
+        //设置适配器
+        mTrackPageView.setAdapter(mTrackPagerAdapter);
     }
 
     @Override
@@ -190,7 +202,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
 
     @Override
     public void onListLoaded(List<Track> list) {
-
+        //LogUtil.d(TAG, "list -- > "+list);
+        //把数据设置到适配器里
+        if (mTrackPagerAdapter != null) {
+            mTrackPagerAdapter.setData(list);
+        }
     }
 
     @Override
@@ -245,11 +261,13 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback {
     }
 
     @Override
-    public void onTrackTitleUpdate(String title) {
-        this.mTrackTitleText=title;
+    public void onCheckUpdate(Track track) {
+        this.mTrackTitleText=track.getTrackTitle();
         if(mTrackTitle!=null)
-        {
-            mTrackTitle.setText(title);
+        {//设置当前节目标题
+            mTrackTitle.setText(mTrackTitleText);
         }
+        //当节目改变的时候我们就获取当前播放中的位置
+        //TODO
     }
 }

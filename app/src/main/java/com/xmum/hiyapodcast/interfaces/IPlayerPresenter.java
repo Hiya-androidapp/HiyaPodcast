@@ -29,4 +29,5 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
 
     //determine if it is playing
     boolean isPlay();
+
 }

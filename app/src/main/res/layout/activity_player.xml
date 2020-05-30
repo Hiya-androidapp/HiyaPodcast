@@ -18,11 +18,11 @@
 />
     <androidx.viewpager.widget.ViewPager
         android:layout_width="match_parent"
+        android:id="@+id/track_pager_view"
         android:layout_height="match_parent"
         android:layout_below="@+id/track_title"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="80dp"
-        android:background="#ff00ff"/>
+        android:layout_marginBottom="80dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_alignParentBottom="true"
