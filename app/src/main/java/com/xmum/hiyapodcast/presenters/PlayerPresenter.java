@@ -1,11 +1,11 @@
 package com.xmum.hiyapodcast.presenters;
 
-import android.util.Log;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.advertis.Advertis;
 import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
-import com.ximalaya.ting.android.opensdk.model.track.CommonTrackList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 import com.ximalaya.ting.android.opensdk.player.advertis.IXmAdsStatusListener;
@@ -29,6 +29,14 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     private static final String TAG="PlayerPresenter";
     private Track mCurrentTrack;
     private int mCurrentIndex=0;
+    private final SharedPreferences mplayModSp;
+    public  static final int PLAY_MODE_LIST_INT =0;
+    public  static final int PLAY_MODE_LIST_LOOP_INT =1;
+    public  static final int PLAY_MODE_RANDOM_INT =2;
+    public  static final int PLAY_MODE_SINGLE_LOOP_INT =3;
+    //sp's key and name
+    public static  String PLAY_MODE_SP_NAME="PlayMod";
+    public static  String PLAY_MODE_SP_KEY="currentPlayMod";
 
     private PlayerPresenter (){
         mPlayerManager = XmPlayerManager.getInstance(BaseApplication.getAppContex());
@@ -36,6 +44,9 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         mPlayerManager.addAdsStatusListener(this);
         //register player status inteface
         mPlayerManager.addPlayerStatusListener(this);
+        //record current play mode
+        mplayModSp = BaseApplication.getAppContex().getSharedPreferences("PlayMod", Context.MODE_PRIVATE);
+
 
     }
     private  static PlayerPresenter sPlayerPresenter;
@@ -107,9 +118,44 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void switchPlayMode(XmPlayListControl.PlayMode mode) {
+        if (mPlayerManager != null) {
+            mPlayerManager.setPlayMode(mode);
+            for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks){
+                iPlayerCallback.onPlayModeChange(mode);
+            }
+            //save state to sp
+            SharedPreferences.Editor edit= mplayModSp.edit();
+            edit.putInt(PLAY_MODE_SP_KEY,getIntByPlayMode(mode));
+            edit.commit();
+        }
 
     }
-
+    private  int getIntByPlayMode(XmPlayListControl.PlayMode mode){
+        switch(mode){
+            case PLAY_MODEL_LIST:
+                return PLAY_MODE_LIST_INT;
+            case PLAY_MODEL_LIST_LOOP:
+                return PLAY_MODE_LIST_LOOP_INT;
+            case PLAY_MODEL_SINGLE_LOOP:
+                return PLAY_MODE_SINGLE_LOOP_INT;
+            case PLAY_MODEL_RANDOM:
+                return PLAY_MODE_RANDOM_INT;
+        }
+        return PLAY_MODE_LIST_INT;
+    }
+    private XmPlayListControl.PlayMode getModeByInt(int index){
+        switch(index){
+            case PLAY_MODE_LIST_INT:
+                return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+            case PLAY_MODE_LIST_LOOP_INT:
+                return XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP;
+            case PLAY_MODE_SINGLE_LOOP_INT:
+                return XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP;
+            case PLAY_MODE_RANDOM_INT:
+                return XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM;
+        }
+        return XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+    }
     @Override
     public void getPlayList() {
         if (mPlayerManager != null) {
@@ -141,6 +187,10 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
         iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
+        //get play mode state from sp
+        int modeIndex=mplayModSp.getInt(PLAY_MODE_SP_KEY,PLAY_MODE_LIST_INT);
+
+        iPlayerCallback.onPlayModeChange(getModeByInt(modeIndex));
         if(!mIPlayerCallbacks.contains(iPlayerCallback))
         {
             mIPlayerCallbacks.add(iPlayerCallback);

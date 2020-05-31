@@ -23,7 +23,9 @@ import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerActivity extends BaseActivity implements IPlayerCallback, ViewPager.OnPageChangeListener {
 
@@ -45,15 +47,30 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
     private ViewPager mTrackPageView;
     private PlayerTrackPagerAdapter mTrackPagerAdapter;
     private boolean mIsUserSlidePager=false;
+    private ImageView mplayModeSwitchBtn;
+    private XmPlayListControl.PlayMode mCurrentMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+    //dealing with switching play mode
+    //1.initial one is PLAY_MODEL_LIST
+    //2.loop play PLAY_MODEL_LOOP
+    //3.random play PLAY_MODEL_RANDOM
+    //4.single loop PLAY_MODEL_SINGLE_LOOP
+    private static Map<XmPlayListControl.PlayMode,XmPlayListControl.PlayMode> sPlayModeRule=new HashMap<>();
+            static{
+                sPlayModeRule.put(XmPlayListControl.PlayMode.PLAY_MODEL_LIST, XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP);
+                sPlayModeRule.put(XmPlayListControl.PlayMode.PLAY_MODEL_LIST_LOOP, XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM);
+                sPlayModeRule.put(XmPlayListControl.PlayMode.PLAY_MODEL_RANDOM, XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP);
+                sPlayModeRule.put(XmPlayListControl.PlayMode.PLAY_MODEL_SINGLE_LOOP, XmPlayListControl.PlayMode.PLAY_MODEL_LIST);
+
+            }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-
+        initView();
         mPlayerPresenter = PlayerPresenter.getsPlayerPresenter();
         mPlayerPresenter.registerViewCallback(this);
-        initView();
+
         //在界面初始化以后，才去获取数据
         mPlayerPresenter.getPlayList();
         initEvent();
@@ -154,6 +171,41 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
                 return false;
             }
         });
+        mplayModeSwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //from current mode to one another
+                XmPlayListControl.PlayMode playMode = sPlayModeRule.get(mCurrentMode);
+                if (mCurrentMode!=null)
+                {
+                    mPlayerPresenter.switchPlayMode(playMode);
+
+                }
+
+
+
+            }
+        });
+    }
+
+    private void updatePlayModeBtnImg() {
+        //update play mode button image by play mode
+        int resId=R.drawable.selector_player_list_order;
+        switch (mCurrentMode){
+            case PLAY_MODEL_LIST:
+                resId= R.drawable.selector_player_list_order;
+                break;
+            case PLAY_MODEL_SINGLE_LOOP:
+                resId= R.drawable.selector_player_single_loop;
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                resId= R.drawable.selector_player_loop;
+                break;
+            case PLAY_MODEL_RANDOM:
+                resId= R.drawable.selector_player_random;
+                break;
+        }
+        mplayModeSwitchBtn.setImageResource(resId);
     }
 
     //find each controller
@@ -174,6 +226,9 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mTrackPagerAdapter = new PlayerTrackPagerAdapter();
         //设置适配器
         mTrackPageView.setAdapter(mTrackPagerAdapter);
+        //switch play mode
+        mplayModeSwitchBtn = this.findViewById(R.id.player_mode_switch_btn);
+
     }
 
     @Override
@@ -229,6 +284,10 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
 
     @Override
     public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
+                //renew play mode and change ui
+                mCurrentMode=playMode;
+                updatePlayModeBtnImg();
+
 
     }
 

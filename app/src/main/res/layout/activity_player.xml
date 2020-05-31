@@ -75,7 +75,7 @@
                 android:layout_width="0dp"
                 android:layout_height="20dp"
                 android:layout_weight="1"
-                android:src="@mipmap/sort" />
+                android:src="@drawable/selector_player_list_order" />
 
             <ImageView
                 android:id="@+id/play_pre"
