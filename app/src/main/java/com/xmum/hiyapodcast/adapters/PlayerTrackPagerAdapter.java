@@ -39,7 +39,7 @@ public class PlayerTrackPagerAdapter extends PagerAdapter {
 
             if(!coverUrlLarge.isEmpty())
             {
-                LogUtil.d(TAG,"URL-->"+coverUrlLarge);
+                //LogUtil.d(TAG,"URL-->"+coverUrlLarge);
                 Picasso.with(container.getContext()).load(coverUrlLarge).into(item);
 
             }else

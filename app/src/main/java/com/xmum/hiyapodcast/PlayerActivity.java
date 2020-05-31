@@ -1,12 +1,17 @@
 package com.xmum.hiyapodcast;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -20,6 +25,7 @@ import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
 import com.xmum.hiyapodcast.presenters.PlayerPresenter;
 import com.xmum.hiyapodcast.utils.LogUtil;
+import com.xmum.hiyapodcast.views.SobPopWindow;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +54,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
     private PlayerTrackPagerAdapter mTrackPagerAdapter;
     private boolean mIsUserSlidePager=false;
     private ImageView mplayModeSwitchBtn;
+    public final int BG_ANIMATION_DURATION=500;
     private XmPlayListControl.PlayMode mCurrentMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
     //dealing with switching play mode
     //1.initial one is PLAY_MODEL_LIST
@@ -63,6 +70,11 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
 
             }
 
+    private View mPlayListBtn;
+    private SobPopWindow mSobPopWindow;
+    private ValueAnimator mEnterBgAnimator;
+    private ValueAnimator mOutBgAnimaator;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +87,30 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mPlayerPresenter.getPlayList();
         initEvent();
         startPlay();
+        initBgAnimation();
+    }
+    //使得透明度渐变
+    private void initBgAnimation() {
+        mEnterBgAnimator = ValueAnimator.ofFloat(1.0f,0.7f);
+        mEnterBgAnimator.setDuration(BG_ANIMATION_DURATION);
+        mEnterBgAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value=(float) animation.getAnimatedValue();
+                updateBgAlpha(value);
+
+            }
+        });
+        mOutBgAnimaator = ValueAnimator.ofFloat(0.7f,1.0f);
+        mOutBgAnimaator.setDuration(BG_ANIMATION_DURATION);
+        mOutBgAnimaator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value=(float) animation.getAnimatedValue();
+                updateBgAlpha(value);
+
+            }
+        });
     }
 
     protected void onDestroy()
@@ -186,6 +222,30 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
 
             }
         });
+        mPlayListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //显示在底部
+                mSobPopWindow.showAtLocation(v, Gravity.BOTTOM,0,0);
+                //设置透明度渐变
+                mEnterBgAnimator.start();
+            }
+        });
+        mSobPopWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                //pop window dismiss
+                mOutBgAnimaator.start();
+            }
+        });
+    }
+    //修改透明度
+    public void updateBgAlpha(float alpha){
+        Window window= getWindow();
+        WindowManager.LayoutParams attributes= window.getAttributes();
+        attributes.alpha=alpha;
+        window.setAttributes(attributes);
     }
 
     private void updatePlayModeBtnImg() {
@@ -228,6 +288,9 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mTrackPageView.setAdapter(mTrackPagerAdapter);
         //switch play mode
         mplayModeSwitchBtn = this.findViewById(R.id.player_mode_switch_btn);
+        //play list
+        mPlayListBtn = this .findViewById(R.id.player_list);
+        mSobPopWindow = new SobPopWindow();
 
     }
 

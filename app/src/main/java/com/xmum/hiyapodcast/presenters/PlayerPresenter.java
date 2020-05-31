@@ -30,10 +30,14 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     private Track mCurrentTrack;
     private int mCurrentIndex=0;
     private final SharedPreferences mplayModSp;
+    //save current play mode
+    private XmPlayListControl.PlayMode mCurrentPlayMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+
     public  static final int PLAY_MODE_LIST_INT =0;
     public  static final int PLAY_MODE_LIST_LOOP_INT =1;
     public  static final int PLAY_MODE_RANDOM_INT =2;
     public  static final int PLAY_MODE_SINGLE_LOOP_INT =3;
+
     //sp's key and name
     public static  String PLAY_MODE_SP_NAME="PlayMod";
     public static  String PLAY_MODE_SP_KEY="currentPlayMod";
@@ -119,7 +123,9 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     @Override
     public void switchPlayMode(XmPlayListControl.PlayMode mode) {
         if (mPlayerManager != null) {
+            mCurrentPlayMode=mode;
             mPlayerManager.setPlayMode(mode);
+            //inform ui update the mode
             for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks){
                 iPlayerCallback.onPlayModeChange(mode);
             }
@@ -189,8 +195,9 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
         //get play mode state from sp
         int modeIndex=mplayModSp.getInt(PLAY_MODE_SP_KEY,PLAY_MODE_LIST_INT);
+        mCurrentPlayMode=getModeByInt(modeIndex);
+        iPlayerCallback.onPlayModeChange(mCurrentPlayMode);
 
-        iPlayerCallback.onPlayModeChange(getModeByInt(modeIndex));
         if(!mIPlayerCallbacks.contains(iPlayerCallback))
         {
             mIPlayerCallbacks.add(iPlayerCallback);
@@ -273,6 +280,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     @Override
     public void onSoundPrepared() {
         LogUtil.d(TAG,"onSoundPrepared");
+        mPlayerManager.setPlayMode(mCurrentPlayMode);
         if (mPlayerManager.getPlayerStatus()== PlayerConstants.STATE_PREPARED) {
             //播放器准备完了 可以去播放了
             mPlayerManager.play();
