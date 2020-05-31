@@ -181,7 +181,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         //start play, change the button to pause
         if(mControlBtn!=null)
         {
-            mControlBtn.setImageResource(R.mipmap.stop);
+            mControlBtn.setImageResource(R.drawable.selector_player_stop);
         }
     }
 
@@ -190,7 +190,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         //start play, change the button to pause
         if(mControlBtn!=null)
         {
-            mControlBtn.setImageResource(R.mipmap.play);
+            mControlBtn.setImageResource(R.drawable.selector_player_play);
         }
     }
 
@@ -199,7 +199,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         //start play, change the button to pause
         if(mControlBtn!=null)
         {
-            mControlBtn.setImageResource(R.mipmap.play);
+            mControlBtn.setImageResource(R.drawable.selector_player_play);
         }
     }
 
