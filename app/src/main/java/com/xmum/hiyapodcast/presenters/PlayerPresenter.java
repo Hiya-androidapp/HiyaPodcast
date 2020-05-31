@@ -9,6 +9,7 @@ import com.ximalaya.ting.android.opensdk.model.track.CommonTrackList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 import com.ximalaya.ting.android.opensdk.player.advertis.IXmAdsStatusListener;
+import com.ximalaya.ting.android.opensdk.player.constants.PlayerConstants;
 import com.ximalaya.ting.android.opensdk.player.service.IXmPlayerStatusListener;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayerException;
@@ -222,6 +223,11 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     @Override
     public void onSoundPrepared() {
         LogUtil.d(TAG,"onSoundPrepared");
+        if (mPlayerManager.getPlayerStatus()== PlayerConstants.STATE_PREPARED) {
+            //播放器准备完了 可以去播放了
+            mPlayerManager.play();
+        }
+        //.d(TAG,"current status ==> "+mPlayerManager.getPlayerStatus());
     }
 
     //switch mode
