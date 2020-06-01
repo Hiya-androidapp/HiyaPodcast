@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class PlayerActivity extends BaseActivity implements IPlayerCallback, ViewPager.OnPageChangeListener {
 
-    private static final String TAG = "?";//这里有问题 但我没看到他什么时候创建的tag
+    private static final String TAG = "PlayerActivity";
     private PlayerPresenter mPlayerPresenter;
     private ImageView mControlBtn;
 
