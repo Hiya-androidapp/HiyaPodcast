@@ -343,7 +343,12 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         if (mTrackPagerAdapter != null) {
             mTrackPagerAdapter.setData(list);
         }
+        //give list a copy of data after data coming back
+        if (mSobPopWindow!=null) {
+            mSobPopWindow.setListData(list);
+        }
     }
+
 
     @Override
     public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {

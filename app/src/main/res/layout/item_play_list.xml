@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+<ImageView
+    android:layout_marginLeft="10dp"
+    android:layout_width="30dp"
+    android:layout_height="30dp"
+    android:background="#FF8C00"
+    />
+    <TextView
+        android:id="@+id/track_title_rv"
+        android:layout_width="match_parent"
+        android:text="I am title"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textColor="#030303"
+        android:textSize="18sp"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
