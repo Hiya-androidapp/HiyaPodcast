@@ -1,5 +1,6 @@
 package com.xmum.hiyapodcast.adapters;
 
+import android.content.ContentUris;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.xmum.hiyapodcast.R;
+import com.xmum.hiyapodcast.base.BaseApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.List;
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerHolder> {
     private List<Track> mData = new ArrayList<>();
-
+    private int playingIndex=0;
     @Override
     public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_play_list,parent,false);
@@ -29,8 +31,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerH
         //set data
         Track track=mData.get(position);
         TextView trackTitleTv = holder.itemView.findViewById(R.id.track_title_rv);
-        trackTitleTv.setText(track.getTrackTitle());
+        //set font color
+        trackTitleTv.setTextColor(BaseApplication.getAppContex().getResources().
+                getColor(playingIndex==position?R.color.second_color:R.color.play_list_text_color));
 
+        trackTitleTv.setText(track.getTrackTitle());
+        //找播放状态的图标
+        View playingIconView=holder.itemView.findViewById((R.id.play_icon_iv));
+        playingIconView.setVisibility(playingIndex==position?View.VISIBLE:View.GONE);
 
     }
 
@@ -42,6 +50,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerH
     public void setData(List<Track> data) {
         mData.clear();
         mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentPlayPosition(int position) {
+        playingIndex=position;
         notifyDataSetChanged();
     }
 
