@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.base.BaseApplication;
+import com.xmum.hiyapodcast.views.SobPopWindow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.List;
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerHolder> {
     private List<Track> mData = new ArrayList<>();
     private int playingIndex=0;
+    private SobPopWindow.PlayListItemClickListener mItemClickListener=null;
+
     @Override
     public InnerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_play_list,parent,false);
@@ -27,7 +30,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerH
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
+    public void onBindViewHolder(@NonNull InnerHolder holder, final int position) {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemClickListener != null) {
+                    mItemClickListener.onItemClick(position);
+                }
+            }
+        });
         //set data
         Track track=mData.get(position);
         TextView trackTitleTv = holder.itemView.findViewById(R.id.track_title_rv);
@@ -56,6 +68,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.InnerH
     public void setCurrentPlayPosition(int position) {
         playingIndex=position;
         notifyDataSetChanged();
+    }
+
+    public void setOnItemClickListener(SobPopWindow.PlayListItemClickListener listener) {
+        this.mItemClickListener=listener;
     }
 
     public class InnerHolder extends  RecyclerView.ViewHolder{

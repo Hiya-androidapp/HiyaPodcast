@@ -239,6 +239,17 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
                 mOutBgAnimaator.start();
             }
         });
+
+        mSobPopWindow.setPlayListItemClickListener(new SobPopWindow.PlayListItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                //說明播放列表里的item被點擊了
+                if (mPlayerPresenter != null) {
+                    mPlayerPresenter.playByIndex(position);
+                }
+            }
+        });
+
     }
     //修改透明度
     public void updateBgAlpha(float alpha){
