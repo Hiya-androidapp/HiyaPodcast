@@ -73,6 +73,7 @@ public class SobPopWindow extends PopupWindow {
     public void setCurrentPlayPosition(int position){
         if (mPlayListAdapter != null) {
             mPlayListAdapter.setCurrentPlayPosition(position);
+            mtrackList.scrollToPosition(position);
         }
     }
 }

@@ -31,10 +31,10 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-        <VideoView
+        <View
             android:layout_width="match_parent"
             android:background="@color/play_list_line_color"
             android:layout_height="1px"
-            android:layout_marginTop="16dp"></VideoView>
+            android:layout_marginTop="16dp"/>
 
 </LinearLayout>
