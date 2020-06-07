@@ -5,13 +5,19 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
+import com.lcodecore.tkrefreshlayout.header.bezierlayout.BezierLayout;
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,14 +35,14 @@ import com.xmum.hiyapodcast.utils.ImageBlur;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.RoundRectImageView;
 import com.xmum.hiyapodcast.views.UILoader;
-
+import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
+import com.xmum.hiyapodcast.base.BaseApplication;
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener {
-    private static final String TAG ="" ;
+public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IPlayerCallback {    private static final String TAG ="" ;
     private ImageView mLargeCover;
     private RoundRectImageView mSmallCover;
     private TextView mAlbumTitle;
@@ -48,6 +54,13 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
     private long mCurrentId = -1;
+    private ImageView mPlayControlBtn;
+    private TextView mPlayControlTips;
+    private PlayerPresenter mPlayerPresenter;
+    private List<Track> mCurrentTracks = null;
+    private final static int DEFAULT_PLAY_INDEX = 0;
+    private TwinklingRefreshLayout mRefreshLayout;
+    private String mCurrentTrackkTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +71,47 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         getWindow().setStatusBarColor(Color.BLACK);
 
         initView();
-
+        //album detail presenter
         mAlbumDetailPresenter=AlbumDetailPresenter.getInstance();
         mAlbumDetailPresenter.registerViewCallback(this);
+        //player presenter
+        mPlayerPresenter = PlayerPresenter.getsPlayerPresenter();
+        mPlayerPresenter.registerViewCallback(this);
+        updatePlayState(mPlayerPresenter.isPlaying());
+        initListener();
 
+    }
+
+    private void initListener() {
+        mPlayControlBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPlayerPresenter != null) {
+                    //check if player has a play list
+                    //todo:
+                    boolean has = mPlayerPresenter.hasPlayList();
+                    if (has) {
+                        //control player status
+                        handlePlayControl();
+                    }else {
+                        handleNoPlayList();
+                    }
+                }
+            }
+        });
+    }
+    //when player has no play list, handle it
+    private void handleNoPlayList() {
+        mPlayerPresenter.setPlayList(mCurrentTracks, DEFAULT_PLAY_INDEX);
+    }
+
+    private void handlePlayControl() {
+        if (mPlayerPresenter.isPlaying()) {
+            //if is playing, then pause
+            mPlayerPresenter.pause();
+        } else {
+            mPlayerPresenter.play();
+        }
     }
 
     private void initView() {
@@ -84,12 +134,18 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         mAlbumTitle=this.findViewById(R.id.tv_album_title);
         mAlbumAuthor= this.findViewById(R.id.tv_album_author);
 
-    }
+        //play control icon
+        mPlayControlBtn = this.findViewById(R.id.detail_play_control);
+        mPlayControlTips = this.findViewById(R.id.play_control_tv);
+        mPlayControlTips.setSelected(true);
 
+    }
+    private boolean mIsLoaderMore=false;
     private View createSuccessView(ViewGroup container) {
         View detailListView = LayoutInflater.from(this).inflate(R.layout.item_detail_list, container, false);
         mDetailList=detailListView.findViewById(R.id.album_detail_list);
-        //use recycleview
+        mRefreshLayout = detailListView.findViewById(R.id.refresh_layout);
+        //use recyclerview
         //1.set layout controller
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mDetailList.setLayoutManager(layoutManager);
@@ -108,11 +164,44 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         });
 
         mDetailListAdapter.setItemClickListener(this);
+        BezierLayout headerView = new BezierLayout(this);
+        mRefreshLayout.setHeaderView(headerView);
+        mRefreshLayout.setMaxHeadHeight(140);
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+                super.onRefresh(refreshLayout);
+                BaseApplication.getsHandler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(DetailActivity.this, "Refresh successful!", Toast.LENGTH_SHORT).show();
+                        mRefreshLayout.finishRefreshing();
+                    }
+                }, 2000);
+            }
+
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                super.onLoadMore(refreshLayout);
+               if( mAlbumDetailPresenter!=null)
+                {
+                    mAlbumDetailPresenter.loadMore();
+                    mIsLoaderMore=true;
+                }
+            }
+        });
         return detailListView;
     }
 
     @Override
     public void onDetailListLoaded(List<Track> trackList) {
+        if(mIsLoaderMore&&mRefreshLayout!=null)
+        {
+            mRefreshLayout.finishLoadmore();
+            mIsLoaderMore=false;
+        }
+
+        this.mCurrentTracks = trackList;
         //judge data result, control UI based on the result
         if (trackList == null || trackList.size() == 0) {
             if (mUiLoader != null) {
@@ -194,5 +283,98 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         //TODO: jump to player interface
         Intent intent = new Intent(this, PlayerActivity.class);
         startActivity(intent);
+    }
+
+
+    private void updatePlayState(boolean playing) {
+        if (mPlayControlBtn != null && mPlayControlTips != null) {
+            mPlayControlBtn.setImageResource(playing? R.drawable.selector_play_control_pause: R.drawable.selector_play_control_play);
+            if(!playing)
+            {
+                mPlayControlTips.setText(R.string.click_play_tips_text);
+            }else
+            {
+                if(!TextUtils.isEmpty(mCurrentTrackkTitle))
+                {
+                    mPlayControlTips.setText(mCurrentTrackkTitle);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlayStart() {
+        //modify icon to pause, text modified to playing
+        updatePlayState(true);
+    }
+
+    @Override
+    public void onPlayPause() {
+        //modify icon to playing, text modified to pause
+        updatePlayState(false);
+    }
+
+    @Override
+    public void onPlayStop() {
+        //modify icon to playing, text modified to pause
+        updatePlayState(false);
+    }
+
+    @Override
+    public void onPlayError() {
+
+    }
+
+    @Override
+    public void nextPlay(Track track) {
+
+    }
+
+    @Override
+    public void onPrePlay(Track track) {
+
+    }
+
+    @Override
+    public void onListLoaded(List<Track> list) {
+
+    }
+
+    @Override
+    public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
+
+    }
+
+    @Override
+    public void onProgressChange(int currentProgress, int total) {
+
+    }
+
+    @Override
+    public void onAdLoading() {
+
+    }
+
+    @Override
+    public void onAdFinished() {
+
+    }
+
+    @Override
+    public void onTrackUpdate(Track track, int playIndex) {
+        if(track!=null)
+        {
+            mCurrentTrackkTitle = track.getTrackTitle();
+            if(!TextUtils.isEmpty(mCurrentTrackkTitle)&&mPlayControlTips!=null)
+            {
+                mPlayControlTips.setText(mCurrentTrackkTitle);
+            }
+        }
+
+    }
+
+    @Override
+    public void updateListOrder(boolean isReverse) {
+
     }
 }

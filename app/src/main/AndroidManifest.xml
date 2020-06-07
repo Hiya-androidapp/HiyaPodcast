@@ -26,7 +26,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".WelcomeActivity">
+        <activity android:name=".WelcomeActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -43,8 +44,8 @@
         <activity android:name=".DetailActivity">
 
         </activity>
-        <activity android:name=".PlayerActivity">
-
+        <activity android:name=".PlayerActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <service android:name="com.ximalaya.ting.android.opensdk.player.service.XmPlayerService"

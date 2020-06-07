@@ -19,6 +19,7 @@ import com.xmum.hiyapodcast.interfaces.IPlayerPresenter;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, IXmPlayerStatusListener {
@@ -32,6 +33,8 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     private final SharedPreferences mplayModSp;
     //save current play mode
     private XmPlayListControl.PlayMode mCurrentPlayMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
+
+    private boolean mIsReverse = false;
 
     public  static final int PLAY_MODE_LIST_INT =0;
     public  static final int PLAY_MODE_LIST_LOOP_INT =1;
@@ -119,7 +122,10 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
             mPlayerManager.playNext();
         }
     }
-
+    //check if there is a play list
+    public boolean hasPlayList(){
+        return isPlayListSet;
+    }
     @Override
     public void switchPlayMode(XmPlayListControl.PlayMode mode) {
         if (mPlayerManager != null) {
@@ -175,7 +181,10 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void playByIndex(int index) {
-
+        //切换播放器到第index的位置进行播放
+        if(mPlayerManager != null) {
+            mPlayerManager.play(index);
+        }
     }
 
     @Override
@@ -185,14 +194,32 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
     }
 
     @Override
-    public boolean isPlay() {
+    public boolean isPlaying() {
         //return the play status
         return mPlayerManager.isPlaying();
     }
+    @Override
+    public void reversePlayList() {
+        //swap play list
+        List<Track> playList = mPlayerManager.getPlayList();
+        Collections.reverse(playList);
+        mIsReverse = !mIsReverse;
 
+        //the first parameter is the play list, the second is the index
+        //new index = total - 1 - current index
+        mCurrentIndex = playList.size() - 1 - mCurrentIndex;
+        mPlayerManager.setPlayList(playList, mCurrentIndex);
+        //update UI
+        mCurrentTrack = (Track) mPlayerManager.getCurrSound();
+        for (IPlayerCallback iPlayerCallback : mIPlayerCallbacks) {
+            iPlayerCallback.onListLoaded(playList);
+            iPlayerCallback.onTrackUpdate(mCurrentTrack, mCurrentIndex);
+            iPlayerCallback.updateListOrder(mIsReverse);
+        }
+    }
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
-        iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
+        iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
         //get play mode state from sp
         int modeIndex=mplayModSp.getInt(PLAY_MODE_SP_KEY,PLAY_MODE_LIST_INT);
         mCurrentPlayMode=getModeByInt(modeIndex);
@@ -304,7 +331,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
             //update ui
             for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks)
             {
-                iPlayerCallback.onCheckUpdate(mCurrentTrack,mCurrentIndex);
+                iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
             }
         }
 

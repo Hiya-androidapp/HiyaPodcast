@@ -6,10 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,8 +28,11 @@ public class SobPopWindow extends PopupWindow {
     private TextView mPlayModeTv;
     private ImageView mPlayModeIv;
     private View mPlayModeContainer;
-    private PlayListPlayModeClickListener mPlayModeClickListener = null;
+    private PlayListActionListener mPlayModeClickListener = null;
 
+    private View mOrderBtnContainer;
+    private ImageView mOrderIcon;
+    private TextView mOrderText;
     public SobPopWindow()
     {
         //set height and weight
@@ -67,6 +69,13 @@ public class SobPopWindow extends PopupWindow {
 
             }
         });
+        mOrderBtnContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //switch play list to ascending/descending
+                mPlayModeClickListener.onOrderClick();
+            }
+        });
     }
 
     private void initView() {
@@ -82,6 +91,10 @@ public class SobPopWindow extends PopupWindow {
         mPlayModeTv = mPopView.findViewById(R.id.play_list_play_mode_tv);
         mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_iv);
         mPlayModeContainer = mPopView.findViewById(R.id.play_list_play_mode_container);
+
+        mOrderBtnContainer = mPopView.findViewById(R.id.play_list_order_container);
+        mOrderIcon = mPopView.findViewById(R.id.play_list_order_iv);
+        mOrderText = mPopView.findViewById(R.id.play_list_order_tv);
     }
     public void setListData(List<Track> data){
         //设置适配器
@@ -97,19 +110,55 @@ public class SobPopWindow extends PopupWindow {
         }
     }
 
+    public void updateOrderIcon(boolean isReverse){
+        mOrderIcon.setImageResource(isReverse?R.drawable.selector_play_mode_list_order: R.drawable.selector_play_mode_list_revers);
+        mOrderText.setText(BaseApplication.getAppContex().getResources().getString(isReverse?R.string.order_text: R.string.reverse_text));
+    }
+
     public void setPlayListItemClickListener(PlayListItemClickListener Listener){
         mPlayListAdapter.setOnItemClickListener(Listener);
 
     }
-
+    //update play mode in play list
+    public void updatePlaymode(XmPlayListControl.PlayMode currentMode) {
+        updatePlayModeBtnImg(currentMode);
+    }
+    private void updatePlayModeBtnImg(XmPlayListControl.PlayMode playMode) {
+        //update play mode button image by play mode
+        int resId=R.drawable.selector_player_list_order;
+        int textId= R.string.play_mode_order_text;
+        switch (playMode){
+            case PLAY_MODEL_LIST:
+                resId= R.drawable.selector_player_list_order;
+                textId=R.string.play_mode_order_text;
+                break;
+            case PLAY_MODEL_SINGLE_LOOP:
+                resId= R.drawable.selector_player_single_loop;
+                textId=R.string.play_mode_random_text;
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                resId= R.drawable.selector_player_loop;
+                textId=R.string.play_mode_list_play_text;
+                break;
+            case PLAY_MODEL_RANDOM:
+                resId= R.drawable.selector_player_random;
+                textId=R.string.play_mode_single_play_text;
+                break;
+        }
+        mPlayModeIv.setImageResource(resId);
+        mPlayModeTv.setText(textId);
+    }
     public interface PlayListItemClickListener{
         void onItemClick(int position);
     }
-    public void setPlayListPlayModeClickListener(PlayListPlayModeClickListener playModeListener){
+    public void setPlayListActionListener(PlayListActionListener playModeListener){
         mPlayModeClickListener = playModeListener;
     }
-    public interface PlayListPlayModeClickListener{
+    public interface PlayListActionListener {
+        //play mode is clicked
         void onPlayModeClick();
+        //ascending/descending button is clicked
+        void onOrderClick();
     }
 
 }

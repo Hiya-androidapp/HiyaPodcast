@@ -8,4 +8,12 @@
         <item>Subscription</item>
         <item>History</item>
     </string-array>
+    <string name="play_mode_order_text">Sequential Play</string>
+    <string name="play_mode_random_text">Random Play</string>
+    <string name="play_mode_list_play_text">List Play</string>
+    <string name="play_mode_single_play_text">Repeat Play</string>
+    <string name="order_text">Ascending</string>
+    <string name="reverse_text">Descending</string>
+    <string name="playing_tips_text">Playing</string>
+    <string name="pause_tips_text">Paused</string>
 </resources>
