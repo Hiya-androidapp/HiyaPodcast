@@ -80,7 +80,7 @@ public class SobPopWindow extends PopupWindow {
         mtrackList.setAdapter(mPlayListAdapter);
         //ABOUT PLAY MODE
         mPlayModeTv = mPopView.findViewById(R.id.play_list_play_mode_tv);
-        mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_tv);
+        mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_iv);
         mPlayModeContainer = mPopView.findViewById(R.id.play_list_play_mode_container);
     }
     public void setListData(List<Track> data){
