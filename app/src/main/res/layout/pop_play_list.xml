@@ -6,15 +6,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:gravity="center_vertical"
         android:id="@+id/play_list_controller_container"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/play_list_play_mode_container"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/play_list_play_mode_iv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/selector_player_list_order" />
+            <TextView
+                android:id="@+id/play_list_play_mode_tv"
+                android:layout_width="wrap_content"
+                android:text="play in order"
+                android:textSize="16sp"
+                android:layout_marginLeft="6dp"
+                android:textColor="#FFA500"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
-        android:orientation="horizontal"></LinearLayout>
+
+    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
 
         android:layout_width="match_parent"
         android:id="@+id/play_list_rv"
         android:layout_height="400dp"
-        android:layout_below="@+id/play_list_controller_container">    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_below="@+id/play_list_controller_container"></androidx.recyclerview.widget.RecyclerView>
+
     <TextView
         android:id="@+id/play_list_close_btn"
         android:layout_width="match_parent"

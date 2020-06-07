@@ -210,14 +210,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         mplayModeSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //from current mode to one another
-                XmPlayListControl.PlayMode playMode = sPlayModeRule.get(mCurrentMode);
-                if (mCurrentMode!=null)
-                {
-                    mPlayerPresenter.switchPlayMode(playMode);
-
-                }
-
+                switchPlayMode();
 
 
             }
@@ -249,8 +242,37 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
                 }
             }
         });
+        mSobPopWindow.setPlayListItemClickListener(new SobPopWindow.PlayListItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                //item in list was clicked
+                if(mPlayerPresenter!=null){
+                    mPlayerPresenter.playByIndex(position);
+                }
+            }
+        });
+        mSobPopWindow.setPlayListPlayModeClickListener(new SobPopWindow.PlayListPlayModeClickListener() {
+            @Override
+            public void onPlayModeClick() {
+                //switch play mode
+                switchPlayMode();
+
+            }
+        });
+
 
     }
+
+    private void switchPlayMode() {
+        //from current mode to one another
+        XmPlayListControl.PlayMode playMode = sPlayModeRule.get(mCurrentMode);
+        if (mCurrentMode!=null)
+        {
+            mPlayerPresenter.switchPlayMode(playMode);
+
+        }
+    }
+
     //修改透明度
     public void updateBgAlpha(float alpha){
         Window window= getWindow();

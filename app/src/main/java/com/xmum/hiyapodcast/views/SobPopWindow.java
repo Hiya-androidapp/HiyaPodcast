@@ -5,8 +5,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,10 @@ public class SobPopWindow extends PopupWindow {
     private View mClosebtn;
     private RecyclerView mtrackList;
     private PlayListAdapter mPlayListAdapter;
+    private TextView mPlayModeTv;
+    private ImageView mPlayModeIv;
+    private View mPlayModeContainer;
+    private PlayListPlayModeClickListener mPlayModeClickListener = null;
 
     public SobPopWindow()
     {
@@ -51,6 +57,16 @@ public class SobPopWindow extends PopupWindow {
                 SobPopWindow.this.dismiss();
             }
         });
+        mPlayModeContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo:swap play mode
+                if (mPlayModeClickListener!=null){
+                    mPlayModeClickListener.onPlayModeClick();
+                }
+
+            }
+        });
     }
 
     private void initView() {
@@ -62,6 +78,10 @@ public class SobPopWindow extends PopupWindow {
         mtrackList.setLayoutManager(layoutManager);
         mPlayListAdapter = new PlayListAdapter();
         mtrackList.setAdapter(mPlayListAdapter);
+        //ABOUT PLAY MODE
+        mPlayModeTv = mPopView.findViewById(R.id.play_list_play_mode_tv);
+        mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_tv);
+        mPlayModeContainer = mPopView.findViewById(R.id.play_list_play_mode_container);
     }
     public void setListData(List<Track> data){
         //设置适配器
@@ -78,10 +98,18 @@ public class SobPopWindow extends PopupWindow {
     }
 
     public void setPlayListItemClickListener(PlayListItemClickListener Listener){
-        mPlayListAdapter.setOnItemClickListener(mPlayListAdapter);
+        mPlayListAdapter.setOnItemClickListener(Listener);
+
     }
 
     public interface PlayListItemClickListener{
         void onItemClick(int position);
     }
+    public void setPlayListPlayModeClickListener(PlayListPlayModeClickListener playModeListener){
+        mPlayModeClickListener = playModeListener;
+    }
+    public interface PlayListPlayModeClickListener{
+        void onPlayModeClick();
+    }
+
 }
