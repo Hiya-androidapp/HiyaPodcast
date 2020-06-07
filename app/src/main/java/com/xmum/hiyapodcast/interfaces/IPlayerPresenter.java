@@ -28,8 +28,6 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
     void seekTo(int progress);
 
     //determine if it is playing
-    boolean isPlaying();
-
-    void reversePlayList();
+    boolean isPlay();
 
 }

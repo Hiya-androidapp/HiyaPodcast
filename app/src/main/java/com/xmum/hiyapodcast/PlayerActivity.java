@@ -1,6 +1,8 @@
 package com.xmum.hiyapodcast;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -26,6 +28,7 @@ import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.SobPopWindow;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +137,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
             @Override
             public void onClick(View v) {
                 //todo:
-                if(mPlayerPresenter.isPlaying())
+                if(mPlayerPresenter.isPlay())
                 {
                     //if status is playing ,then pause
                     mPlayerPresenter.pause();
@@ -248,20 +251,12 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
                 }
             }
         });
-        mSobPopWindow.setPlayListActionListener(new SobPopWindow.PlayListActionListener() {
+        mSobPopWindow.setPlayListPlayModeClickListener(new SobPopWindow.PlayListPlayModeClickListener() {
             @Override
             public void onPlayModeClick() {
                 //switch play mode
                 switchPlayMode();
 
-            }
-
-            @Override
-            public void onOrderClick() {
-                //click to switch ascending/descending
-                if (mPlayerPresenter != null) {
-                    mPlayerPresenter.reversePlayList();
-                }
             }
         });
 
@@ -392,9 +387,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
     public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
                 //renew play mode and change ui
                 mCurrentMode=playMode;
-                mSobPopWindow.updatePlaymode(mCurrentMode);
                 updatePlayModeBtnImg();
-                //renew play mode in pop
 
 
     }
@@ -446,7 +439,7 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
     }
 
     @Override
-    public void onTrackUpdate(Track track, int playIndex) {
+    public void onCheckUpdate(Track track, int playIndex) {
         this.mTrackTitleText=track.getTrackTitle();
         if(mTrackTitle!=null)
         {//设置当前节目标题
@@ -461,11 +454,6 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
         if (mSobPopWindow != null) {
             mSobPopWindow.setCurrentPlayPosition(playIndex);
         }
-    }
-
-    @Override
-    public void updateListOrder(boolean isReverse) {
-        mSobPopWindow.updateOrderIcon(isReverse);
     }
 
 

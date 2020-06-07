@@ -39,7 +39,5 @@ public interface IPlayerCallback  {
      * @param track 节目
      */
     // update the current title
-    void onTrackUpdate(Track track, int playIndex);
-
-    void updateListOrder(boolean isReverse);
+    void onCheckUpdate(Track track, int playIndex);
 }
