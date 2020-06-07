@@ -387,7 +387,9 @@ public class PlayerActivity extends BaseActivity implements IPlayerCallback, Vie
     public void onPlayModeChange(XmPlayListControl.PlayMode playMode) {
                 //renew play mode and change ui
                 mCurrentMode=playMode;
+                mSobPopWindow.updatePlaymode(mCurrentMode);
                 updatePlayModeBtnImg();
+                //renew play mode in pop
 
 
     }

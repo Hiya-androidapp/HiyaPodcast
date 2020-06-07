@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.adapters.PlayListAdapter;
 import com.xmum.hiyapodcast.base.BaseApplication;
@@ -100,6 +101,35 @@ public class SobPopWindow extends PopupWindow {
     public void setPlayListItemClickListener(PlayListItemClickListener Listener){
         mPlayListAdapter.setOnItemClickListener(Listener);
 
+    }
+
+    public void updatePlaymode(XmPlayListControl.PlayMode currentMode) {
+        updatePlayModeBtnImg(currentMode);
+    }
+    private void updatePlayModeBtnImg(XmPlayListControl.PlayMode playMode) {
+        //update play mode button image by play mode
+        int resId=R.drawable.selector_player_list_order;
+        int textId= R.string.play_mode_order_text;
+        switch (playMode){
+            case PLAY_MODEL_LIST:
+                resId= R.drawable.selector_player_list_order;
+                textId=R.string.play_mode_order_text;
+                break;
+            case PLAY_MODEL_SINGLE_LOOP:
+                resId= R.drawable.selector_player_single_loop;
+                textId=R.string.play_mode_single_text;
+                break;
+            case PLAY_MODEL_LIST_LOOP:
+                resId= R.drawable.selector_player_loop;
+                textId=R.string.play_mode_list_text;
+                break;
+            case PLAY_MODEL_RANDOM:
+                resId= R.drawable.selector_player_random;
+                textId=R.string.play_mode_single_text;
+                break;
+        }
+        mPlayModeIv.setImageResource(resId);
+        mPlayModeTv.setText(textId);
     }
 
     public interface PlayListItemClickListener{
