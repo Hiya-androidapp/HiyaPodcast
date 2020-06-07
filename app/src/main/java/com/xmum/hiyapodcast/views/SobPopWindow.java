@@ -30,7 +30,10 @@ public class SobPopWindow extends PopupWindow {
     private TextView mPlayModeTv;
     private ImageView mPlayModeIv;
     private View mPlayModeContainer;
-    private PlayListPlayModeClickListener mPlayModeClickListener = null;
+    private PlayListActionListener mPlayModeClickListener = null;
+    private View mOrderBtnContainer;
+    private ImageView mOrderIcon;
+    private TextView mOrderText;
 
     public SobPopWindow()
     {
@@ -61,11 +64,18 @@ public class SobPopWindow extends PopupWindow {
         mPlayModeContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //todo:swap play mode
+                //switch play mode
                 if (mPlayModeClickListener!=null){
                     mPlayModeClickListener.onPlayModeClick();
                 }
 
+            }
+        });
+        mOrderBtnContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //switch play list to ascending/descending
+                mPlayModeClickListener.onOrderClick();
             }
         });
     }
@@ -83,6 +93,9 @@ public class SobPopWindow extends PopupWindow {
         mPlayModeTv = mPopView.findViewById(R.id.play_list_play_mode_tv);
         mPlayModeIv = mPopView.findViewById(R.id.play_list_play_mode_tv);
         mPlayModeContainer = mPopView.findViewById(R.id.play_list_play_mode_container);
+        mOrderBtnContainer = mPopView.findViewById(R.id.play_list_order_container);
+        mOrderIcon = mPopView.findViewById(R.id.play_list_order_iv);
+        mOrderText = mPopView.findViewById(R.id.play_list_order_tv);
     }
     public void setListData(List<Track> data){
         //设置适配器
@@ -105,6 +118,11 @@ public class SobPopWindow extends PopupWindow {
 
     public void updatePlaymode(XmPlayListControl.PlayMode currentMode) {
         updatePlayModeBtnImg(currentMode);
+    }
+
+    public void updateOrderIcon(boolean isReverse){
+        mOrderIcon.setImageResource(isReverse?R.drawable.selector_player_list_order: R.drawable.selector_play_mode_list_reverse);
+        mOrderText.setText(BaseApplication.getAppContex().getResources().getString(isReverse?R.string.order_text: R.string.reverse_text));
     }
     private void updatePlayModeBtnImg(XmPlayListControl.PlayMode playMode) {
         //update play mode button image by play mode
@@ -135,11 +153,14 @@ public class SobPopWindow extends PopupWindow {
     public interface PlayListItemClickListener{
         void onItemClick(int position);
     }
-    public void setPlayListPlayModeClickListener(PlayListPlayModeClickListener playModeListener){
+    public void setPlayListActionListener(PlayListActionListener playModeListener){
         mPlayModeClickListener = playModeListener;
     }
-    public interface PlayListPlayModeClickListener{
+    public interface PlayListActionListener{
+        //play mode is clicked
         void onPlayModeClick();
+        //ascending/descending button is clicked
+        void onOrderClick();
     }
 
 }
