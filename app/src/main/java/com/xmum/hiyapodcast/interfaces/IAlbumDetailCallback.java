@@ -12,4 +12,8 @@ public interface IAlbumDetailCallback {
     void onNetworkError(int i, String s);
     //把ALBUM 传给ui
     void onAlbumLoaded(Album album);
+    //size > 0 refers to success
+    void onLoaderMoreFinished(int size);
+    //size > 0 refers to success
+    void onRefreshFinished(int size);
 }

@@ -268,6 +268,20 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     }
 
     @Override
+    public void onLoaderMoreFinished(int size) {
+        if (size > 0) {
+            Toast.makeText(this, "successfully load " + size + " audios", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "no more audios", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRefreshFinished(int size) {
+
+    }
+
+    @Override
     public void onRetryClick() {
         //click to reloading
         if (mAlbumDetailPresenter != null) {

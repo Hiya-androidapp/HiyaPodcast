@@ -31,4 +31,7 @@ public interface IPlayerPresenter extends IBasePresenter<IPlayerCallback> {
     boolean isPlaying();
 
     void reversePlayList();
+
+    //play the first audio of an album
+    void playByAlbumId(long id);
 }

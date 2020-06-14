@@ -1,23 +1,21 @@
 package com.xmum.hiyapodcast.presenters;
 
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
+import com.xmum.hiyapodcast.api.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.IRecommendPresenter;
 import com.xmum.hiyapodcast.interfaces.IRecommendViewCallBack;
-import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class RecommendPresenter implements IRecommendPresenter {
     public static String TAG="RecommendPresenter";
     private List<IRecommendViewCallBack> mCallBacks =new ArrayList<>();
+    private List<Album> mCurrentRecommend = null;
+
     private RecommendPresenter(){}
     private static RecommendPresenter sInstance=null;
 
@@ -36,13 +34,16 @@ public class RecommendPresenter implements IRecommendPresenter {
 
         return sInstance;
     }
+
+    //get current recommendation list
+    public List<Album> getCurrentRecommend() {
+        return mCurrentRecommend;
+    }
     @Override
     public void getRecommendList() {
         updateLoading();
-        Map<String, String> map = new HashMap<>();
-        //number of return
-        map.put(DTransferConstants.LIKE_COUNT, Constant.COUNT_RECOMMAND +"");
-        CommonRequest.getGuessLikeAlbum(map, new IDataCallBack<GussLikeAlbumList>(){
+        HiyaApi hiyaApi = HiyaApi.getsHiyaApi();
+        hiyaApi.getRecommendList(new IDataCallBack<GussLikeAlbumList>(){
 
             @Override
             public void onSuccess(GussLikeAlbumList gussLikeAlbumList) {
@@ -51,7 +52,7 @@ public class RecommendPresenter implements IRecommendPresenter {
                 {
                     List<Album> albumList=gussLikeAlbumList.getAlbumList();
                     //update ui
-                   // upRecommendUI(albumList);
+                    // upRecommendUI(albumList);
                     handlerRecommendResult(albumList);
                 }
             }
@@ -91,6 +92,7 @@ public class RecommendPresenter implements IRecommendPresenter {
             {
                 callBack.onRecommendListLoaded(albumList);
             }
+            this.mCurrentRecommend = albumList;
             }
         }
     }

@@ -1,21 +1,16 @@
 package com.xmum.hiyapodcast.presenters;
 
-import com.squareup.picasso.Picasso;
-import com.ximalaya.ting.android.opensdk.constants.DTransferConstants;
-import com.ximalaya.ting.android.opensdk.datatrasfer.CommonRequest;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
+import com.xmum.hiyapodcast.api.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailPresenter;
-import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AlbumDetailPresenter implements IAlbumDetailPresenter {
 
@@ -63,13 +58,8 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
         }
     }
     private void doLoaded(final boolean isLoaderMore){
-        Map<String, String> map = new HashMap<String, String>();
-
-        map.put(DTransferConstants.SORT, "asc");
-        map.put(DTransferConstants.ALBUM_ID, mCurrentAlbumId+"");
-        map.put(DTransferConstants.PAGE, mCurrentPageIndex+"");
-        map.put(DTransferConstants.PAGE_SIZE, Constant.COUNT_DEFAULT+"");
-        CommonRequest.getTracks(map, new IDataCallBack<TrackList>(){
+        HiyaApi hiyaApi = HiyaApi.getsHiyaApi();
+        hiyaApi.getAlbumDetail(new IDataCallBack<TrackList>(){
 
             @Override
             public void onSuccess(TrackList trackList) {
@@ -81,6 +71,8 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
                     {
                         //pull up to load more(result before first one)
                         mTracks.addAll(tracks);
+                        int size = tracks.size();
+                        handlerLoaderMoreResult(size);
                     }else {
                         //pull down to load more (result behind the last one)
                         mTracks.addAll(0,tracks);
@@ -100,7 +92,14 @@ public class AlbumDetailPresenter implements IAlbumDetailPresenter {
                 LogUtil.d(TAG,"errorMsg" +s);
                 handlerError(i, s);
             }
-        });
+        }, mCurrentAlbumId, mCurrentPageIndex);
+    }
+
+    //handle load more result
+    private void handlerLoaderMoreResult(int size) {
+        for (IAlbumDetailCallback callback : mCallbacks) {
+            callback.onLoaderMoreFinished(size);
+        }
     }
 
     @Override

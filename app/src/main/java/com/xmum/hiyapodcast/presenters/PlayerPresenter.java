@@ -2,17 +2,21 @@ package com.xmum.hiyapodcast.presenters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
+import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.PlayableModel;
 import com.ximalaya.ting.android.opensdk.model.advertis.Advertis;
 import com.ximalaya.ting.android.opensdk.model.advertis.AdvertisList;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
+import com.ximalaya.ting.android.opensdk.model.track.TrackList;
 import com.ximalaya.ting.android.opensdk.player.XmPlayerManager;
 import com.ximalaya.ting.android.opensdk.player.advertis.IXmAdsStatusListener;
 import com.ximalaya.ting.android.opensdk.player.constants.PlayerConstants;
 import com.ximalaya.ting.android.opensdk.player.service.IXmPlayerStatusListener;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayerException;
+import com.xmum.hiyapodcast.api.HiyaApi;
 import com.xmum.hiyapodcast.base.BaseApplication;
 import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
 import com.xmum.hiyapodcast.interfaces.IPlayerPresenter;
@@ -27,23 +31,26 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     private List<IPlayerCallback> mIPlayerCallbacks=new ArrayList<>();
     private  final XmPlayerManager mPlayerManager;
-    private static final String TAG="PlayerPresenter";
+    private static final String TAG = "PlayerPresenter";
     private Track mCurrentTrack;
-    private int mCurrentIndex=0;
+    public static final int DEFAULT_PLAY_INDEX = 0;
+    private int mCurrentIndex = DEFAULT_PLAY_INDEX;
     private final SharedPreferences mplayModSp;
     //save current play mode
     private XmPlayListControl.PlayMode mCurrentPlayMode = XmPlayListControl.PlayMode.PLAY_MODEL_LIST;
 
     private boolean mIsReverse = false;
 
-    public  static final int PLAY_MODE_LIST_INT =0;
-    public  static final int PLAY_MODE_LIST_LOOP_INT =1;
-    public  static final int PLAY_MODE_RANDOM_INT =2;
-    public  static final int PLAY_MODE_SINGLE_LOOP_INT =3;
+    public  static final int PLAY_MODE_LIST_INT = 0;
+    public  static final int PLAY_MODE_LIST_LOOP_INT = 1;
+    public  static final int PLAY_MODE_RANDOM_INT = 2;
+    public  static final int PLAY_MODE_SINGLE_LOOP_INT = 3;
 
     //sp's key and name
     public static  String PLAY_MODE_SP_NAME="PlayMod";
     public static  String PLAY_MODE_SP_KEY="currentPlayMod";
+    private int mCurrentProgressPosition = 0;
+    private int mProgressDuration = 0;
 
     private PlayerPresenter (){
         mPlayerManager = XmPlayerManager.getInstance(BaseApplication.getAppContex());
@@ -217,9 +224,41 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
             iPlayerCallback.updateListOrder(mIsReverse);
         }
     }
+
+    @Override
+    public void playByAlbumId(long id) {
+        //todo:
+        //1. get the content of an album
+        HiyaApi hiyaApi = HiyaApi.getsHiyaApi();
+        hiyaApi.getAlbumDetail(new IDataCallBack<TrackList>() {
+            @Override
+            public void onSuccess(TrackList trackList) {
+                //2. set the album content to the player
+                List<Track> tracks = trackList.getTracks();
+                if (trackList != null && tracks.size() > 0) {
+                    mPlayerManager.setPlayList(tracks, DEFAULT_PLAY_INDEX);
+                    isPlayListSet = true;
+                    //在一个专辑中第一次打开一个播放界面获取名称
+                    mCurrentTrack = tracks.get(DEFAULT_PLAY_INDEX);
+                    mCurrentIndex = DEFAULT_PLAY_INDEX;
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                Toast.makeText(BaseApplication.getAppContex(), "request failed", Toast.LENGTH_SHORT).show();
+            }
+        }, (int)id, 1);
+        //3. play
+    }
+
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
+        //inform the recent audio
         iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
+        iPlayerCallback.onProgressChange(mCurrentProgressPosition, mProgressDuration);
+        //update state
+        handlePlayState(iPlayerCallback);
         //get play mode state from sp
         int modeIndex=mplayModSp.getInt(PLAY_MODE_SP_KEY,PLAY_MODE_LIST_INT);
         mCurrentPlayMode=getModeByInt(modeIndex);
@@ -228,6 +267,16 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         if(!mIPlayerCallbacks.contains(iPlayerCallback))
         {
             mIPlayerCallbacks.add(iPlayerCallback);
+        }
+    }
+
+    private void handlePlayState(IPlayerCallback iPlayerCallback) {
+        int playerStatus = mPlayerManager.getPlayerStatus();
+        //invoke interface method based on the state
+        if (PlayerConstants.STATE_STARTED == playerStatus) {
+            iPlayerCallback.onPlayStart();
+        } else {
+            iPlayerCallback.onPlayPause();
         }
     }
 
@@ -354,6 +403,8 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void onPlayProgress(int currentPos, int duration) {
+        this.mCurrentProgressPosition = currentPos;
+        this.mProgressDuration = duration;
         LogUtil.d(TAG,"onPlayProgress");
         //unit ms
         for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks)

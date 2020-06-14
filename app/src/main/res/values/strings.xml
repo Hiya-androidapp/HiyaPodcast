@@ -16,4 +16,5 @@
     <string name="reverse_text">Descending</string>
     <string name="playing_tips_text">Playing</string>
     <string name="pause_tips_text">Paused</string>
+    <string name="listener_as_you_like_text">Listen something</string>
 </resources>

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.xmum.hiyapodcast.DetailActivity;
 import com.xmum.hiyapodcast.R;
@@ -63,6 +64,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
         //the use of RecycleView
         //1. find the controller
         mRecommendRv = mRootView.findViewById(R.id.recommend_list);
+        TwinklingRefreshLayout twinklingRefreshLayout = mRootView.findViewById(R.id.over_scroll_view);
+        twinklingRefreshLayout.setPureScrollModeOn();
         //2. set layout manager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
