@@ -19,4 +19,6 @@ public interface ISearchCallback {
 
     //callback method of recommended keyword
     void onRecommendMoreLoaded(List<QueryResult> keyWordList);
+
+    void onError(int errorCode,String errorMsg);
 }

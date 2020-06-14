@@ -127,7 +127,7 @@ public class RecommendPresenter implements IRecommendPresenter {
     public void unRegisterViewCallback(IRecommendViewCallBack callBack) {
         if(mCallBacks!=null)
         {
-            mCallBacks.remove(mCallBacks);
+            mCallBacks.remove(callBack);
         }
     }
 }

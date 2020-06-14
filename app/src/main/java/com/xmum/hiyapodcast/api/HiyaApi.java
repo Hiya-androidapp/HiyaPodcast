@@ -6,6 +6,8 @@ import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
 import com.ximalaya.ting.android.opensdk.model.album.SearchAlbumList;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
+import com.ximalaya.ting.android.opensdk.model.word.HotWordList;
+import com.ximalaya.ting.android.opensdk.model.word.SuggestWords;
 import com.xmum.hiyapodcast.utils.Constant;
 
 import java.util.HashMap;
@@ -54,5 +56,18 @@ public class HiyaApi {
         map.put(DTransferConstants.PAGE, page + "");
         map.put(DTransferConstants.PAGE_SIZE, Constant.COUNT_DEFAULT + "");
         CommonRequest.getSearchedAlbums(map, callback);
+    }
+    //get hot words
+    public void getHotWords(IDataCallBack<HotWordList> callBack){
+        Map<String, String> map = new HashMap<>();
+        map.put(DTransferConstants.TOP,String.valueOf(Constant.COUNT_HOT_WORDS) );
+        CommonRequest.getHotWords(map, callBack);
+    }
+    //Get associative words according to keywords
+    public void  getSuggestWord(String keyword, IDataCallBack<SuggestWords> callBack)
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(DTransferConstants.SEARCH_KEY, keyword);
+        CommonRequest.getSuggestWord(map, callBack);
     }
 }

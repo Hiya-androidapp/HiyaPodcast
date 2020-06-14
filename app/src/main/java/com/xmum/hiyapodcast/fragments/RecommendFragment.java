@@ -13,7 +13,7 @@ import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.xmum.hiyapodcast.DetailActivity;
 import com.xmum.hiyapodcast.R;
-import com.xmum.hiyapodcast.adapters.RecommendListAdapter;
+import com.xmum.hiyapodcast.adapters.AlbumListAdapter;
 import com.xmum.hiyapodcast.base.BaseFragment;
 import com.xmum.hiyapodcast.interfaces.IRecommendViewCallBack;
 import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
@@ -25,12 +25,12 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, RecommendListAdapter.OnRecommendItemClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, AlbumListAdapter.OnRecommendItemClickListener {
 
     private static final String TAG="RecommendFragment";
     private View mRootView;
     private  RecyclerView mRecommendRv;
-    private  RecommendListAdapter mRecommendListAdapter;
+    private AlbumListAdapter mRecommendListAdapter;
     private RecommendPresenter mRecommendPresenter;
     private UILoader mUiLoader;
     @Override
@@ -80,7 +80,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendViewCal
             }
         });
         //3. set adapter
-        mRecommendListAdapter = new RecommendListAdapter();
+        mRecommendListAdapter = new AlbumListAdapter();
         mRecommendRv.setAdapter(mRecommendListAdapter);
         mRecommendListAdapter.setOnRecommendItemClickListner(this);
         return mRootView;

@@ -17,9 +17,9 @@ import com.xmum.hiyapodcast.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecommendListAdapter extends RecyclerView.Adapter<RecommendListAdapter.InnerHolder> {
+public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.InnerHolder> {
     private  List<Album> mData=new ArrayList<>();
-    private static String TAG="RecommendListAdapter";
+    private static String TAG="AlbumListAdapter";
     private OnRecommendItemClickListener mItemClickListner=null;
 
     @NonNull
