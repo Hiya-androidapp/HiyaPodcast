@@ -8,5 +8,5 @@ public class Constant {
     public static int COUNT_DEFAULT=50;
 
     //number of hot words
-    public static int COUNT_HOT_WORDS=10;
+    public static int COUNT_HOT_WORDS=20;
 }
