@@ -93,6 +93,7 @@ public class SearchPresenter implements ISearchPresenter {
 
     @Override
     public void getHotWord() {
+        //todo: hotword buffer for data saving
         mHiyaApi.getHotWords(new IDataCallBack<HotWordList>() {
             @Override
             public void onSuccess(HotWordList hotWordList) {
@@ -122,9 +123,12 @@ public class SearchPresenter implements ISearchPresenter {
             public void onSuccess(SuggestWords suggestWords) {
                 if(suggestWords!=null)
                 {
-
                     List<QueryResult> keyWordList=suggestWords.getKeyWordList();
                     LogUtil.d(TAG,"hotWords size-->"+keyWordList.size());
+
+                    for (ISearchCallback iSearchCallback : mCallback) {
+                        iSearchCallback.onRecommendMoreLoaded(keyWordList);
+                    }
                 }
             }
 
