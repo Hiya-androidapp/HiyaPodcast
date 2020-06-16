@@ -1,5 +1,6 @@
 package com.xmum.hiyapodcast.adapters;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,7 +94,12 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
             albumPlayCountTv.setText(album.getPlayCount() + "");
             albumContentSizeTv.setText(album.getIncludeTrackCount() + "");
 
-            Picasso.with(itemView.getContext()).load(album.getCoverUrlLarge()).into(albumCoverIv);
+            String coverUrlLarge = album.getCoverUrlLarge();
+            if (!TextUtils.isEmpty(coverUrlLarge)) {
+                Picasso.with(itemView.getContext()).load(coverUrlLarge).into(albumCoverIv);
+            }else {
+                albumCoverIv.setImageResource(R.mipmap.logo);
+            }
 
         }
     }

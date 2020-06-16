@@ -86,7 +86,8 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
             mRecommendAdapter.setItemClickListener(new SearchRecommendAdapter.ItemClickListener() {
                 @Override
                 public void onItemClick(String keyword) {
-
+                    //执行搜索
+                    Switch2Search(keyword);
                 }
             });
         }
@@ -100,17 +101,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
         mFlowTextLayout.setClickListener(new FlowTextLayout.ItemClickListener() {
             @Override
             public void onItemClick(String text) {
-                //set hot words into search box
-                mInputBox.setText(text);
-                mInputBox.setSelection(text.length());
-                //go search
-                if(mSearchPresenter!=null){
-                    mSearchPresenter.doSearch(text);
-                }
-                //change UI status
-                if(mUILoader!=null){
-                    mUILoader.updateStatus(UILoader.UIStatus.LOADING);
-                }
+                Switch2Search(text);
             }
         });
         mUILoader.setOnRetryClickListener(new UILoader.OnRetryClickListener() {
@@ -172,6 +163,21 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
 //            }
 //        });
     }
+
+    private void Switch2Search(String text) {
+        //set hot words into search box
+        mInputBox.setText(text);
+        mInputBox.setSelection(text.length());
+        //go search
+        if(mSearchPresenter!=null){
+            mSearchPresenter.doSearch(text);
+        }
+        //change UI status
+        if(mUILoader!=null){
+            mUILoader.updateStatus(UILoader.UIStatus.LOADING);
+        }
+    }
+
     //获取联想的关键词
     private void getSuggestWord(String keyword) {
         if (mSearchPresenter != null) {
