@@ -12,12 +12,16 @@ import com.ximalaya.ting.android.opensdk.model.word.SuggestWords;
 import com.xmum.hiyapodcast.api.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.ISearchCallback;
 import com.xmum.hiyapodcast.interfaces.ISearchPresenter;
+import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 public class SearchPresenter implements ISearchPresenter {
+
+    private List<Album> searchResult=new ArrayList<>();
 
     private static final String TAG = "SearchPresenter";
     //current keyword
@@ -25,6 +29,8 @@ public class SearchPresenter implements ISearchPresenter {
     private final HiyaApi mHiyaApi;
     private static final int DEFAULT_PAGE = 1;
     private int mCurrentPage = DEFAULT_PAGE;
+    private List<Album> mSearchResult;
+    //private Hashtable mSearchResult;
 
     private SearchPresenter(){
         mHiyaApi = HiyaApi.getsHiyaApi();
@@ -47,10 +53,13 @@ public class SearchPresenter implements ISearchPresenter {
     private List<ISearchCallback> mCallback = new ArrayList<>();
     @Override
     public void doSearch(String keyword) {
+        mCurrentPage=DEFAULT_PAGE;
+        searchResult.clear();
         //be used to get new search result
         //when network is not good, the user will click Re-Search
         this.mCurrentKeyword = keyword;
         search(keyword);
+
     }
 
     private void search(String keyword) {
@@ -58,11 +67,21 @@ public class SearchPresenter implements ISearchPresenter {
             @Override
             public void onSuccess(SearchAlbumList searchAlbumList) {
                 List<Album> albums = searchAlbumList.getAlbums();
+                searchResult.addAll(albums);
                 if (albums != null) {
                     LogUtil.d(TAG, "albums size -- > " + albums.size());
-                    for (ISearchCallback iSearchCallback : mCallback) {
-                        iSearchCallback.onSearchResultLoaded(albums);
+                    if (mIsLoadMore) {
+                        for (ISearchCallback iSearchCallback : mCallback) {
+                            iSearchCallback.onLoadMoreResult(searchResult, true);
+                        }
+                        mIsLoadMore=false;
                     }
+                    else{
+                        for (ISearchCallback iSearchCallback : mCallback) {
+                            iSearchCallback.onSearchResultLoaded(searchResult);
+                        }
+                    }
+
                 } else {
                     LogUtil.d(TAG, "album is null..");
                 }
@@ -75,7 +94,13 @@ public class SearchPresenter implements ISearchPresenter {
                 LogUtil.d(TAG, "errorMsg -- > " + errorMsg);
                 for(ISearchCallback iSearchCallback:mCallback)
                 {
-                    iSearchCallback.onError(errorCode,errorMsg);
+                    if (mIsLoadMore) {
+                        iSearchCallback.onLoadMoreResult(searchResult, false);
+                        mCurrentPage--;
+                        mIsLoadMore=false;
+                    }else {
+                        iSearchCallback.onError(errorCode,errorMsg);
+                    }
                 }
             }
         });
@@ -86,8 +111,21 @@ public class SearchPresenter implements ISearchPresenter {
         search(mCurrentKeyword);
     }
 
+    private boolean mIsLoadMore=false;
+
     @Override
     public void loadMore() {
+        //determine does it need to load more or not
+        if (mSearchResult.size()< Constant.COUNT_DEFAULT) {
+            for (ISearchCallback iSearchCallback : mCallback) {
+                iSearchCallback.onLoadMoreResult(mSearchResult,false);
+            }
+        }else {
+            mIsLoadMore=true;
+            mCurrentPage++;
+            search(mCurrentKeyword);
+
+        }
 
     }
 

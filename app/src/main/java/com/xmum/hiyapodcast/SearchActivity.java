@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.word.HotWord;
 import com.ximalaya.ting.android.opensdk.model.word.QueryResult;
@@ -25,7 +27,9 @@ import com.xmum.hiyapodcast.adapters.AlbumListAdapter;
 import com.xmum.hiyapodcast.adapters.SearchRecommendAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.ISearchCallback;
+import com.xmum.hiyapodcast.presenters.RecommendPresenter;
 import com.xmum.hiyapodcast.presenters.SearchPresenter;
+import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.FlowTextLayout;
 import com.xmum.hiyapodcast.views.UILoader;
@@ -52,6 +56,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
     private View mDelBtn;
     private RecyclerView mSearchRecommendList;
     private SearchRecommendAdapter mRecommendAdapter;
+    private TwinklingRefreshLayout mRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +86,17 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
         }
     }
     private void initEvent() {
+
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                LogUtil.d(TAG,"load more...");
+                //加载更多的内容
+                if (mSearchPresenter != null) {
+                    mSearchPresenter.loadMore();
+                }
+            }
+        });
 
         if (mRecommendAdapter != null) {
             mRecommendAdapter.setItemClickListener(new SearchRecommendAdapter.ItemClickListener() {
@@ -223,6 +239,9 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
     //创建数据请求成功的view
     private View createSuccessView() {
         View resultView = LayoutInflater.from(this).inflate(R.layout.search_result_layout, null);
+        //刷新控件
+        mRefreshLayout = resultView.findViewById(R.id.search_result_refresh_layout);
+
         //show hot words
         mFlowTextLayout = resultView.findViewById(R.id.recommend_hot_word_view);
         mResultListView = resultView.findViewById(R.id.result_list_view);
@@ -253,10 +272,15 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
     @Override
     public void onSearchResultLoaded(List<Album> result) {
         hideSuccessView();
-        mResultListView.setVisibility(View.VISIBLE);
+        mRefreshLayout.setVisibility(View.VISIBLE);
         //HIDE KEYBOARD
 
+        handleSearchResult(result);
         mImm.hideSoftInputFromWindow(mInputBox.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+
+    }
+
+    private void handleSearchResult(List<Album> result) {
         if(result!=null)
         {
             if(result.size()==0)
@@ -295,7 +319,15 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
 
     @Override
     public void onLoadMoreResult(List<Album> result, boolean isOkay) {
-
+        //process the result of load more
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+        if (isOkay) {
+            handleSearchResult(result);
+        }else{
+            Toast.makeText(SearchActivity.this,"That's all.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -315,7 +347,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
     }
     private void hideSuccessView(){
         mSearchRecommendList.setVisibility(View.GONE);
-        mResultListView.setVisibility(View.GONE);
+        mRefreshLayout.setVisibility(View.GONE);
         mFlowTextLayout.setVisibility(View.GONE);
     }
     @Override
