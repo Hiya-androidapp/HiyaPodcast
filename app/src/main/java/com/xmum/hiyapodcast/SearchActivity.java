@@ -1,6 +1,7 @@
 package com.xmum.hiyapodcast;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Editable;
@@ -27,6 +28,7 @@ import com.xmum.hiyapodcast.adapters.AlbumListAdapter;
 import com.xmum.hiyapodcast.adapters.SearchRecommendAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.ISearchCallback;
+import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.presenters.RecommendPresenter;
 import com.xmum.hiyapodcast.presenters.SearchPresenter;
 import com.xmum.hiyapodcast.utils.Constant;
@@ -40,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SearchActivity extends BaseActivity implements ISearchCallback {
+public class SearchActivity extends BaseActivity implements ISearchCallback, AlbumListAdapter.OnRecommendItemClickListener {
 
     private static final String TAG = "SearchActivity";
     private View mBackBtn;
@@ -86,7 +88,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
         }
     }
     private void initEvent() {
-
+        mAlbumListAdapter.setOnRecommendItemClickListner(this);
         mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
@@ -241,7 +243,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
         View resultView = LayoutInflater.from(this).inflate(R.layout.search_result_layout, null);
         //刷新控件
         mRefreshLayout = resultView.findViewById(R.id.search_result_refresh_layout);
-
+        mRefreshLayout.setEnableRefresh(false);
         //show hot words
         mFlowTextLayout = resultView.findViewById(R.id.recommend_hot_word_view);
         mResultListView = resultView.findViewById(R.id.result_list_view);
@@ -356,5 +358,14 @@ public class SearchActivity extends BaseActivity implements ISearchCallback {
             mUILoader.updateStatus(UILoader.UIStatus.NETWORK_ERROR);
         }
 
+    }
+
+    @Override
+    public void onItemClick(int position, Album album) {
+        AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+
+        //click item, jump to item
+        Intent intent= new Intent(this, DetailActivity.class);
+        startActivity(intent);
     }
 }
