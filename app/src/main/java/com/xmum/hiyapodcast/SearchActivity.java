@@ -59,6 +59,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
     private RecyclerView mSearchRecommendList;
     private SearchRecommendAdapter mRecommendAdapter;
     private TwinklingRefreshLayout mRefreshLayout;
+    private boolean mNeedSuggestWords=true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +105,9 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
             mRecommendAdapter.setItemClickListener(new SearchRecommendAdapter.ItemClickListener() {
                 @Override
                 public void onItemClick(String keyword) {
-                    //执行搜索
+                    //执行搜索 推荐热词的点击
+                    //不需要相关的联想词
+                    mNeedSuggestWords=false;
                     Switch2Search(keyword);
                 }
             });
@@ -119,6 +122,8 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
         mFlowTextLayout.setClickListener(new FlowTextLayout.ItemClickListener() {
             @Override
             public void onItemClick(String text) {
+                //不需要相关的联想词
+                mNeedSuggestWords=false;
                 Switch2Search(text);
             }
         });
@@ -164,8 +169,13 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
 
                 }else {
                     mDelBtn.setVisibility(View.VISIBLE);
-                    //Trigger associative query
-                    getSuggestWord(s.toString());
+                    if (mNeedSuggestWords) {
+                        //Trigger associative query
+                        getSuggestWord(s.toString());
+                    }else {
+                        mNeedSuggestWords=true;
+                    }
+
                 }
             }
 
