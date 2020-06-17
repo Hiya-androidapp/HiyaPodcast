@@ -72,7 +72,7 @@ public class SearchPresenter implements ISearchPresenter {
                     LogUtil.d(TAG, "albums size -- > " + albums.size());
                     if (mIsLoadMore) {
                         for (ISearchCallback iSearchCallback : mCallback) {
-                            iSearchCallback.onLoadMoreResult(searchResult, true);
+                            iSearchCallback.onLoadMoreResult(searchResult, albums.size()!=0);
                         }
                         mIsLoadMore=false;
                     }
