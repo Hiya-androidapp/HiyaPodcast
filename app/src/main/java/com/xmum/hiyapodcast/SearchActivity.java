@@ -147,6 +147,11 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
             @Override
             public void onClick(View v) {
                 String keyword=mInputBox.getText().toString().trim();
+                if (TextUtils.isEmpty(keyword)) {
+                    //can give a hint
+                    Toast.makeText(SearchActivity.this,"Keyword can't be empty when searching",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (mSearchPresenter != null) {
                     mSearchPresenter.doSearch(keyword);
                     mUILoader.updateStatus(UILoader.UIStatus.LOADING);
@@ -193,6 +198,11 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
     }
 
     private void Switch2Search(String text) {
+        if (TextUtils.isEmpty(text)) {
+            //can give a hint
+            Toast.makeText(this,"Keyword can't be empty when searching",Toast.LENGTH_SHORT).show();
+            return;
+        }
         //set hot words into search box
         mInputBox.setText(text);
         mInputBox.setSelection(text.length());
