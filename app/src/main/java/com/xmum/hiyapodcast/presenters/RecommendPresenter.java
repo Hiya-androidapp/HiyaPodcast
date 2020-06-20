@@ -3,7 +3,7 @@ package com.xmum.hiyapodcast.presenters;
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.album.GussLikeAlbumList;
-import com.xmum.hiyapodcast.api.HiyaApi;
+import com.xmum.hiyapodcast.data.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.IRecommendPresenter;
 import com.xmum.hiyapodcast.interfaces.IRecommendViewCallBack;
 import com.xmum.hiyapodcast.utils.LogUtil;

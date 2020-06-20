@@ -19,6 +19,7 @@ import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.xmum.hiyapodcast.adapters.IndicatorAdapter;
 import com.xmum.hiyapodcast.adapters.MainContentAdapter;
+import com.xmum.hiyapodcast.data.HiyaDbHelper;
 import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
 import com.xmum.hiyapodcast.presenters.PlayerPresenter;
 import com.xmum.hiyapodcast.presenters.RecommendPresenter;
@@ -52,8 +53,9 @@ public class MainActivity extends FragmentActivity implements IPlayerCallback {
         setContentView(R.layout.activity_main);
         initView();
         initEvent();
-        //
+
         initPresenter();
+
     }
 
     private void initPresenter() {

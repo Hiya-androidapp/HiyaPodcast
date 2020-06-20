@@ -29,8 +29,12 @@ import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.xmum.hiyapodcast.adapters.DetailListAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
+import com.xmum.hiyapodcast.interfaces.ISubscriptionCallback;
+import com.xmum.hiyapodcast.interfaces.ISubscriptionPresenter;
 import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.presenters.PlayerPresenter;
+import com.xmum.hiyapodcast.presenters.SubscriptionPresenter;
+import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.ImageBlur;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.RoundRectImageView;
@@ -42,7 +46,8 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 import java.util.List;
 
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IPlayerCallback {    private static final String TAG ="" ;
+public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IPlayerCallback, ISubscriptionCallback {
+    private static final String TAG ="DetailActivity" ;
     private ImageView mLargeCover;
     private RoundRectImageView mSmallCover;
     private TextView mAlbumTitle;
@@ -61,6 +66,9 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     private final static int DEFAULT_PLAY_INDEX = 0;
     private TwinklingRefreshLayout mRefreshLayout;
     private String mCurrentTrackkTitle;
+    private TextView mSubBtn;
+    private ISubscriptionPresenter mSubscriptionPresenter;
+    private Album mCurrentAlbum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +79,46 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         getWindow().setStatusBarColor(Color.BLACK);
 
         initView();
+        initPresenter();
+        //set state of sub button
+        updateSbuState();
+        updatePlayState(mPlayerPresenter.isPlaying());
+        initListener();
+    }
+
+    private void updateSbuState() {
+        if(mSubscriptionPresenter!=null)
+        {
+           boolean isSub= mSubscriptionPresenter.isSub(mCurrentAlbum);
+           mSubBtn.setText(isSub?R.string.cancel_sub_tips_text:R.string.sub_tips_text);
+        }
+    }
+
+    private void initPresenter() {
         //album detail presenter
-        mAlbumDetailPresenter=AlbumDetailPresenter.getInstance();
+        mAlbumDetailPresenter= AlbumDetailPresenter.getInstance();
         mAlbumDetailPresenter.registerViewCallback(this);
         //player presenter
         mPlayerPresenter = PlayerPresenter.getsPlayerPresenter();
         mPlayerPresenter.registerViewCallback(this);
-        updatePlayState(mPlayerPresenter.isPlaying());
-        initListener();
 
+        //subscription prsenter
+        mSubscriptionPresenter= SubscriptionPresenter.getInstance();
+        mSubscriptionPresenter.getSubscriptionList();
+        mSubscriptionPresenter.registerViewCallback(this);
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+        if (mAlbumDetailPresenter != null) {
+            mAlbumDetailPresenter.unRegisterViewCallback(this);
+        }
+        if (mPlayerPresenter != null) {
+            mPlayerPresenter.unRegisterViewCallback(this);
+        }
+        if (mSubscriptionPresenter != null) {
+            mSubscriptionPresenter.unRegisterViewCallback(this);
+        }
     }
 
     private void initListener() {
@@ -95,6 +134,21 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
                         handlePlayControl();
                     }else {
                         handleNoPlayList();
+                    }
+                }
+            }
+        });
+        mSubBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSubscriptionPresenter!=null)
+                {
+                    boolean isSub=mSubscriptionPresenter.isSub(mCurrentAlbum);
+                    //if not sub, sub,vice versa
+                    if (isSub) {
+                        mSubscriptionPresenter.deleteSubscription(mCurrentAlbum);
+                    }else {
+                        mSubscriptionPresenter.addSubscription(mCurrentAlbum);
                     }
                 }
             }
@@ -138,6 +192,8 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         mPlayControlBtn = this.findViewById(R.id.detail_play_control);
         mPlayControlTips = this.findViewById(R.id.play_control_tv);
         mPlayControlTips.setSelected(true);
+        //subscription
+        mSubBtn = this.findViewById(R.id.detail_sub_btn);
 
     }
     private boolean mIsLoaderMore=false;
@@ -172,7 +228,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
             @Override
             public void onRefresh(TwinklingRefreshLayout refreshLayout) {
                 super.onRefresh(refreshLayout);
-                BaseApplication.getsHandler().postDelayed(new Runnable() {
+                BaseApplication.getHandler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(DetailActivity.this, "Refresh successful!", Toast.LENGTH_SHORT).show();
@@ -226,6 +282,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
 
     @Override
     public void onAlbumLoaded(Album album) {
+        this.mCurrentAlbum=album;
         //get detail content
         long id=album.getId();
         mCurrentId = id;
@@ -392,4 +449,38 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     public void updateListOrder(boolean isReverse) {
 
     }
+
+    @Override
+    public void onAddResult(boolean isSuccess) {
+        if (isSuccess) {
+            //如果成功了，那就修改UI成取消订阅
+            mSubBtn.setText(R.string.cancel_sub_tips_text);
+        }
+        //给个toast
+        String tipsText = isSuccess ? "Subscribe Successful!" : "Subscribe Fail!";
+        Toast.makeText(this, tipsText, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDeleteResult(boolean isSuccess) {
+        if (isSuccess) {
+            //如果成功了，那就修改UI成取消订阅
+            mSubBtn.setText(R.string.sub_tips_text);
+        }
+        //给个toast
+        String tipsText = isSuccess ? "Delete Successful!" : "Delete Fail!";
+        Toast.makeText(this, tipsText, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSubscriptionLoaded(List<Album> albums) {
+
+    }
+
+    @Override
+    public void onSubFull() {
+        //处理一个即可，toast
+        Toast.makeText(this, "Can't exceed 100! " + Constant.MAX_SUB_COUNT, Toast.LENGTH_SHORT).show();
+    }
+
 }

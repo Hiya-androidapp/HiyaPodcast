@@ -42,4 +42,5 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
+    implementation "io.reactivex.rxjava3:rxjava:3.0.4"
 }

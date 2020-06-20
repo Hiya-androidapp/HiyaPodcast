@@ -2,6 +2,7 @@
     <string name="app_name">HiyaPodcast</string>
     <string name="network_error_click_to_retry">Network Error，Click to retry!</string>
     <string name="sub_tips_text">+Follow</string>
+    <string name="cancel_sub_tips_text">Unfollow</string>
     <string name="click_play_tips_text">Continue Play</string>
     <string-array name="indicator_title">
         <item>Recommendation</item>

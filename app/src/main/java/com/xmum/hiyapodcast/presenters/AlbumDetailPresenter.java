@@ -4,7 +4,7 @@ import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.ximalaya.ting.android.opensdk.model.track.TrackList;
-import com.xmum.hiyapodcast.api.HiyaApi;
+import com.xmum.hiyapodcast.data.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailPresenter;
 import com.xmum.hiyapodcast.utils.LogUtil;

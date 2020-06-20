@@ -1,7 +1,5 @@
 package com.xmum.hiyapodcast.presenters;
 
-import android.util.Log;
-
 import com.ximalaya.ting.android.opensdk.datatrasfer.IDataCallBack;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.album.SearchAlbumList;
@@ -9,14 +7,13 @@ import com.ximalaya.ting.android.opensdk.model.word.HotWord;
 import com.ximalaya.ting.android.opensdk.model.word.HotWordList;
 import com.ximalaya.ting.android.opensdk.model.word.QueryResult;
 import com.ximalaya.ting.android.opensdk.model.word.SuggestWords;
-import com.xmum.hiyapodcast.api.HiyaApi;
+import com.xmum.hiyapodcast.data.HiyaApi;
 import com.xmum.hiyapodcast.interfaces.ISearchCallback;
 import com.xmum.hiyapodcast.interfaces.ISearchPresenter;
 import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 public class SearchPresenter implements ISearchPresenter {

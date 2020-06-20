@@ -43,7 +43,7 @@ public abstract class UILoader extends FrameLayout {
     {
         mCurrentStatus=status;
         // ui upatedate must in the main process
-        BaseApplication.getsHandler().post(new Runnable() {
+        BaseApplication.getHandler().post(new Runnable() {
             @Override
             public void run() {
                 switchUIByCurrentStatus();

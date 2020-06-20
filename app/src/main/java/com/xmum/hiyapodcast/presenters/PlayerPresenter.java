@@ -16,7 +16,7 @@ import com.ximalaya.ting.android.opensdk.player.constants.PlayerConstants;
 import com.ximalaya.ting.android.opensdk.player.service.IXmPlayerStatusListener;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayListControl;
 import com.ximalaya.ting.android.opensdk.player.service.XmPlayerException;
-import com.xmum.hiyapodcast.api.HiyaApi;
+import com.xmum.hiyapodcast.data.HiyaApi;
 import com.xmum.hiyapodcast.base.BaseApplication;
 import com.xmum.hiyapodcast.interfaces.IPlayerCallback;
 import com.xmum.hiyapodcast.interfaces.IPlayerPresenter;

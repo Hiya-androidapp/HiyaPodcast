@@ -45,7 +45,7 @@ public class BaseApplication extends Application {
     {
         return sContext;
     }
-    public static Handler getsHandler(){
+    public static Handler getHandler(){
         return sHandler;
     }
 }
