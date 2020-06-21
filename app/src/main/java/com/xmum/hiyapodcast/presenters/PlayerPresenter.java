@@ -254,6 +254,12 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
 
     @Override
     public void registerViewCallback(IPlayerCallback iPlayerCallback) {
+        if(!mIPlayerCallbacks.contains(iPlayerCallback))
+    {
+        mIPlayerCallbacks.add(iPlayerCallback);
+    }
+        //give UI page data before renewing
+        getPlayList();
         //inform the recent audio
         iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
         iPlayerCallback.onProgressChange(mCurrentProgressPosition, mProgressDuration);
@@ -264,10 +270,7 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         mCurrentPlayMode=getModeByInt(modeIndex);
         iPlayerCallback.onPlayModeChange(mCurrentPlayMode);
 
-        if(!mIPlayerCallbacks.contains(iPlayerCallback))
-        {
-            mIPlayerCallbacks.add(iPlayerCallback);
-        }
+
     }
 
     private void handlePlayState(IPlayerCallback iPlayerCallback) {

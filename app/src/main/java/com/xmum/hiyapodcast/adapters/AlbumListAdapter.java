@@ -105,7 +105,7 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
 
         }
     }
-    public void setOnRecommendItemClickListner(OnRecommendItemClickListener listner)
+    public void setAlbumItemClickListner(OnRecommendItemClickListener listner)
     {
         this.mItemClickListner=listner;
     }

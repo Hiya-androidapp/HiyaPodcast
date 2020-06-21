@@ -29,9 +29,7 @@ import com.xmum.hiyapodcast.adapters.SearchRecommendAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.ISearchCallback;
 import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
-import com.xmum.hiyapodcast.presenters.RecommendPresenter;
 import com.xmum.hiyapodcast.presenters.SearchPresenter;
-import com.xmum.hiyapodcast.utils.Constant;
 import com.xmum.hiyapodcast.utils.LogUtil;
 import com.xmum.hiyapodcast.views.FlowTextLayout;
 import com.xmum.hiyapodcast.views.UILoader;
@@ -89,7 +87,7 @@ public class SearchActivity extends BaseActivity implements ISearchCallback, Alb
         }
     }
     private void initEvent() {
-        mAlbumListAdapter.setOnRecommendItemClickListner(this);
+        mAlbumListAdapter.setAlbumItemClickListner(this);
         mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {

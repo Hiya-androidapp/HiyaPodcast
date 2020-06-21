@@ -1,5 +1,6 @@
 package com.xmum.hiyapodcast.fragments;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +11,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
+import com.xmum.hiyapodcast.DetailActivity;
 import com.xmum.hiyapodcast.R;
 import com.xmum.hiyapodcast.adapters.AlbumListAdapter;
 import com.xmum.hiyapodcast.base.BaseFragment;
 import com.xmum.hiyapodcast.interfaces.ISubscriptionCallback;
 import com.xmum.hiyapodcast.interfaces.ISubscriptionPresenter;
+import com.xmum.hiyapodcast.presenters.AlbumDetailPresenter;
 import com.xmum.hiyapodcast.presenters.SubscriptionPresenter;
 
 import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class SubscriptionFragment extends BaseFragment implements ISubscriptionCallback {
+public class SubscriptionFragment extends BaseFragment implements ISubscriptionCallback, AlbumListAdapter.OnRecommendItemClickListener {
 
     private ISubscriptionPresenter mSubscriptionPresenter;
     private RecyclerView mSubListView;
@@ -39,6 +42,7 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
         mSubListView.setLayoutManager(new LinearLayoutManager(container.getContext()));
 
         mAlbumListAdapter = new AlbumListAdapter();
+        mAlbumListAdapter.setAlbumItemClickListner(this);
         mSubListView.setAdapter(mAlbumListAdapter);
         mSubListView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
@@ -83,5 +87,17 @@ public class SubscriptionFragment extends BaseFragment implements ISubscriptionC
         if (mSubscriptionPresenter != null) {
             mSubscriptionPresenter.unRegisterViewCallback(this);
         }
+        mAlbumListAdapter.setAlbumItemClickListner(null);
+    }
+
+
+    @Override
+    public void onItemClick(int position, Album album) {
+        AlbumDetailPresenter.getInstance().setTargetAlbum(album);
+
+        //click item, jump to item
+        Intent intent= new Intent(getContext(), DetailActivity.class);
+        startActivity(intent);
     }
 }
+
