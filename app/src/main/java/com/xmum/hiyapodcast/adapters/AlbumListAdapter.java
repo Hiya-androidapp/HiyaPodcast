@@ -21,7 +21,8 @@ import java.util.List;
 public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.InnerHolder> {
     private  List<Album> mData=new ArrayList<>();
     private static String TAG="AlbumListAdapter";
-    private OnRecommendItemClickListener mItemClickListner=null;
+    private OnAlbumItemClickListener mItemClickListner = null;
+    private OnAlbumItemLongClickListener mLongClickListener = null;
 
     @NonNull
     @Override
@@ -48,6 +49,17 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
             }
         });
         holder.setData(mData.get(position));
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mLongClickListener != null) {
+                    int ClickPosition = (int) v.getTag();
+                    mLongClickListener.onItemLongClick(mData.get(ClickPosition));
+                }
+                //return true means consume this event
+                return true;
+            }
+        });
     }
 
     @Override
@@ -105,11 +117,20 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Inne
 
         }
     }
-    public void setAlbumItemClickListner(OnRecommendItemClickListener listner)
+    public void setAlbumItemClickListner(OnAlbumItemClickListener listner)
     {
         this.mItemClickListner=listner;
     }
-    public interface OnRecommendItemClickListener {
+    public interface OnAlbumItemClickListener {
         void onItemClick(int position,Album album);
+    }
+
+    public void setOnAlbumItemLongClickListener(OnAlbumItemLongClickListener listener) {
+        this.mLongClickListener = listener;
+    }
+
+    //long click interface
+    public interface OnAlbumItemLongClickListener {
+        void onItemLongClick(Album album);
     }
 }

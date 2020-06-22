@@ -25,7 +25,7 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 
 import java.util.List;
 
-public class RecommendFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, AlbumListAdapter.OnRecommendItemClickListener {
+public class AlbumFragment extends BaseFragment implements IRecommendViewCallBack, UILoader.OnRetryClickListener, AlbumListAdapter.OnAlbumItemClickListener {
 
     private static final String TAG="RecommendFragment";
     private View mRootView;

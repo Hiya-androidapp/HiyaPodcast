@@ -2,7 +2,7 @@ package com.xmum.hiyapodcast.utils;
 
 import com.xmum.hiyapodcast.base.BaseFragment;
 import com.xmum.hiyapodcast.fragments.HistoryFragment;
-import com.xmum.hiyapodcast.fragments.RecommendFragment;
+import com.xmum.hiyapodcast.fragments.AlbumFragment;
 import com.xmum.hiyapodcast.fragments.SubscriptionFragment;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class FragmentCreator {
 
         switch (index) {
             case INDEX_RECOMMEND:
-                baseFragment = new RecommendFragment();
+                baseFragment = new AlbumFragment();
                 break;
             case INDEX_SUBSCRIPTION:
                 baseFragment = new SubscriptionFragment();
