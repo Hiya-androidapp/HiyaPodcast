@@ -95,7 +95,7 @@ public abstract class UILoader extends FrameLayout {
 
     }
 
-    private View getEmptyView() {
+    protected View getEmptyView() {
         return LayoutInflater.from(getContext()).inflate(R.layout.fragment_empty_view,this,false);
     }
 
@@ -116,7 +116,7 @@ public abstract class UILoader extends FrameLayout {
     //因为不知道返回什么所以是抽象类，其余都是固定页面
     protected abstract View getSuccessView(ViewGroup container);
 
-    private View getLoadingView() {
+    protected View getLoadingView() {
         return LayoutInflater.from(getContext()).inflate(R.layout.fragment_loading_view,this,false);
     }
     public void setOnRetryClickListener(OnRetryClickListener listener) {

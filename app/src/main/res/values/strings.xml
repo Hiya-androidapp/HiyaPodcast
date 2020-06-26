@@ -20,4 +20,6 @@
     <string name="listener_as_you_like_text">Listen something</string>
     <string name="cancel_sub_success">Successfully unsubscribe</string>
     <string name="cancel_sub_failed">Unsubscribe failed</string>
+    <string name="no_sub_contents_tips_text">Nothing is here,subscribe something you like now!</string>
+    <string name="no_search_content_tips_text">Cannot find something related, try searching others!</string>
 </resources>
