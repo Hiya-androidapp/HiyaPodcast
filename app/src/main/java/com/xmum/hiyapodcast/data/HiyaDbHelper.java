@@ -36,6 +36,18 @@ public class HiyaDbHelper extends SQLiteOpenHelper {
                 Constant.SUB_ALBUM_ID + " integer" +
                 ")";
         db.execSQL(subTbSql);
+        //Create history
+        String historyTbSql = "create table " + Constant.HISTORY_TB_NAME + "(" +
+                Constant.HISTORY_ID + " integer primary key autoincrement, " +
+                Constant.HISTORY_TRACK_ID + " integer, " +
+                Constant.HISTORY_TITLE + " varchar," +
+                Constant.HISTORY_COVER + " varchar," +
+                Constant.HISTORY_PLAY_COUNT + " integer," +
+                Constant.HISTORY_DURATION + " integer," +
+                Constant.HISTORY_AUTHOR + " varchar," +
+                Constant.HISTORY_UPDATE_TIME + " integer" +
+                ")";
+        db.execSQL(historyTbSql);
 
     }
 

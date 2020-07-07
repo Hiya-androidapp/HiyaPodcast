@@ -374,15 +374,19 @@ public class PlayerPresenter implements IPlayerPresenter, IXmAdsStatusListener, 
         //curMordel stand for current content
         //getKind() to get the kind of content
         //track represent track type
+        if(curModel !=null){
+            LogUtil.d(TAG,"curModel.."+curModel.getKind());
+        }
         mCurrentIndex=mPlayerManager.getCurrentIndex();
-        if(curModel instanceof Track)
-        {
+        if(curModel instanceof Track) {
             Track currentTrack = (Track) curModel;
-            mCurrentTrack=currentTrack;
-            LogUtil.d(TAG,"TITLE "+mCurrentTrack);
-            //update ui
-            for(IPlayerCallback iPlayerCallback:mIPlayerCallbacks)
-            {
+            mCurrentTrack = currentTrack;
+            //保存播放记录
+            HistoryPresenter historyPresenter = HistoryPresenter.getHistoryPresenter();
+            historyPresenter.addHistory(currentTrack);
+            //LogUtil.d(TAG, "title =-= > " + currentTrack.getTrackTitle());
+            //更新UI
+            for(IPlayerCallback iPlayerCallback : mIPlayerCallbacks) {
                 iPlayerCallback.onTrackUpdate(mCurrentTrack,mCurrentIndex);
             }
         }

@@ -3,7 +3,7 @@ package com.xmum.hiyapodcast.interfaces;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
 import com.xmum.hiyapodcast.base.IBasePresenter;
 
-public interface IHistoryPresenter extends IBasePresenter {
+public interface IHistoryPresenter extends IBasePresenter<IHistoryCallback> {
     /**
      * get history
      * /

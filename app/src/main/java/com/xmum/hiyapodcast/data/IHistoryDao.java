@@ -20,9 +20,8 @@ public interface IHistoryDao {
     void delHistory(Track track);
     /**
      * clean history
-     * @param track
      */
-    void cleanHistories(Track track);
+    void cleanHistories();
     /**
      * add history
      * /
