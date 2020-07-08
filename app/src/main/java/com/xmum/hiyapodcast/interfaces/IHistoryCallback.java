@@ -5,7 +5,7 @@ import com.xmum.hiyapodcast.base.IBasePresenter;
 
 import java.util.List;
 
-public interface IHistoryCallback extends IBasePresenter<IHistoryCallback> {
+public interface IHistoryCallback  {
     //loading history
     void onHistoriesLoaded(List<Track> tracks);
 }

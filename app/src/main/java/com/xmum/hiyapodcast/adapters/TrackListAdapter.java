@@ -15,13 +15,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.InnerHolder> {
+public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.InnerHolder> {
 
     private List<Track> mDetailData = new ArrayList<>();
     //format time
     private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat mDurationFormat = new SimpleDateFormat("mm:ss");
     private ItemClickListener mItemClickListener = null;
+    private ItemLongClickListener mItemLongClickListener = null;
 
     @NonNull
     @Override
@@ -32,7 +33,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DetailListAdapter.InnerHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull TrackListAdapter.InnerHolder holder, final int position) {
         //find controller, set data
         View itemView = holder.itemView;
         //order ID
@@ -47,7 +48,7 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
         TextView updateDateTv = itemView.findViewById(R.id.detail_item_update_time);
 
         //set data
-        Track track = mDetailData.get(position);
+        final Track track = mDetailData.get(position);
         orderTv.setText((position+1) + "");
         titleTv.setText(track.getTrackTitle());
         playCountTv.setText(track.getPlayCount() + "");
@@ -68,6 +69,15 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
                     mItemClickListener.onItemClick(mDetailData,position);
 
                 }
+            }
+        });
+        itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(mItemLongClickListener != null) {
+                    mItemLongClickListener.onItemLongClick(track);
+                }
+                return true;
             }
         });
     }
@@ -98,5 +108,12 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.In
 
     public interface ItemClickListener {
         void onItemClick(List<Track> detailData, int position);
+    }
+    public void setItemLongClickListener(ItemLongClickListener listener) {
+        this.mItemLongClickListener = listener;
+    }
+
+    public interface ItemLongClickListener {
+        void onItemLongClick(Track track);
     }
 }

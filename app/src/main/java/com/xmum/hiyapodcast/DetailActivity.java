@@ -26,7 +26,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.ximalaya.ting.android.opensdk.model.album.Album;
 import com.ximalaya.ting.android.opensdk.model.track.Track;
-import com.xmum.hiyapodcast.adapters.DetailListAdapter;
+import com.xmum.hiyapodcast.adapters.TrackListAdapter;
 import com.xmum.hiyapodcast.base.BaseActivity;
 import com.xmum.hiyapodcast.interfaces.IAlbumDetailCallback;
 import com.xmum.hiyapodcast.interfaces.ISubscriptionCallback;
@@ -46,7 +46,7 @@ import net.lucode.hackware.magicindicator.buildins.UIUtil;
 import java.util.List;
 
 
-public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, DetailListAdapter.ItemClickListener, IPlayerCallback, ISubscriptionCallback {
+public class DetailActivity extends BaseActivity implements IAlbumDetailCallback, UILoader.OnRetryClickListener, TrackListAdapter.ItemClickListener, IPlayerCallback, ISubscriptionCallback {
     private static final String TAG ="DetailActivity" ;
     private ImageView mLargeCover;
     private RoundRectImageView mSmallCover;
@@ -55,7 +55,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
     private AlbumDetailPresenter mAlbumDetailPresenter;
     private int mCurrentPage=1;
     private RecyclerView mDetailList;
-    private DetailListAdapter mDetailListAdapter;
+    private TrackListAdapter mDetailListAdapter;
     private FrameLayout mDetailListContainer;
     private UILoader mUiLoader;
     private long mCurrentId = -1;
@@ -206,7 +206,7 @@ public class DetailActivity extends BaseActivity implements IAlbumDetailCallback
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         mDetailList.setLayoutManager(layoutManager);
         //2.set adapter
-        mDetailListAdapter = new DetailListAdapter();
+        mDetailListAdapter = new TrackListAdapter();
         mDetailList.setAdapter(mDetailListAdapter);
         //set item margin
         mDetailList.addItemDecoration(new RecyclerView.ItemDecoration() {
