@@ -1,7 +1,7 @@
 package com.xmum.hiyapodcast.utils;
 
 public class Constant {
-    public static final int MAX_SUB_COUNT = 3;
+    public static final int MAX_SUB_COUNT = 100;
     //number of recommendation
     public static int COUNT_RECOMMAND =50;
 
