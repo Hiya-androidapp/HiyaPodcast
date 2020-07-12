@@ -134,7 +134,7 @@ public class SobPopWindow extends PopupWindow {
                 break;
             case PLAY_MODEL_SINGLE_LOOP:
                 resId= R.drawable.selector_player_single_loop;
-                textId=R.string.play_mode_random_text;
+                textId=R.string.play_mode_single_play_text;
                 break;
             case PLAY_MODEL_LIST_LOOP:
                 resId= R.drawable.selector_player_loop;
@@ -142,7 +142,7 @@ public class SobPopWindow extends PopupWindow {
                 break;
             case PLAY_MODEL_RANDOM:
                 resId= R.drawable.selector_player_random;
-                textId=R.string.play_mode_single_play_text;
+                textId=R.string.play_mode_random_text;
                 break;
         }
         mPlayModeIv.setImageResource(resId);
